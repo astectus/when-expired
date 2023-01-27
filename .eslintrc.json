@@ -19,12 +19,14 @@
     "rules": {
         "react-native/no-unused-styles": 2,
         "react-native/split-platform-components": 2,
+        "import/prefer-default-export": "off",
         // "react-native/no-inline-styles": 2,
         // "react-native/no-color-literals": 2,
         // "react-native/no-raw-text": 2,
         "react-native/no-single-element-style-arrays": 2,
         "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
         "react/react-in-jsx-scope": "off",
-        "@typescript-eslint/no-use-before-define": ["error", { "variables": false }]
+        "@typescript-eslint/no-use-before-define": ["error", { "variables": false }],
+        "@typescript-eslint/no-shadow": "off"
     }
 }

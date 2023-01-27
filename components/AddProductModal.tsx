@@ -1,7 +1,7 @@
 import { Overlay, Text, Button, Icon, Input } from '@rneui/base';
 import { StyleSheet, View } from 'react-native';
 import { useState } from 'react';
-import Product from '../modals/Product';
+import Product from '../models/Product';
 
 export default function AddProductModal({
     visible,
@@ -17,7 +17,7 @@ export default function AddProductModal({
         name: '',
         expirationDate: '',
         price: '',
-        photoUrl: '',
+        photoUri: '',
         description: '',
     });
     const onSaveProduct = () => {
