@@ -86,6 +86,10 @@ export default function App() {
     await loadProducts();
     setVisible(false);
   };
+  
+  const deleteProduct = async (id: string) => {
+
+  };
 
   return (
     <ThemeProvider theme={theme}>
