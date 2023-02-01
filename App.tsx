@@ -3,10 +3,16 @@ import { StyleSheet, View, FlatList, Platform } from 'react-native';
 import { createTheme, ThemeProvider, lightColors, darkColors, Button } from '@rneui/themed';
 import { preventAutoHideAsync, hideAsync } from 'expo-splash-screen';
 
+import { QueryClientProvider, QueryClient } from 'react-query';
 import AddProductModal from './components/AddProductModal';
 import ProductListItem from './components/ProductListItem';
 import Product from './models/Product';
-import { init, insertProduct, fetchProducts } from './utils/database';
+import { init, insertProduct, fetchProducts, deleteProduct } from './utils/database';
+import Scanner from './components/Scanner';
+import { BarCode } from './models/BarCode';
+import { getProductByBarcode } from './api/api';
+import { useQuery } from 'react-query';
+import QueryData from './components/QueryData';
 
 const theme = createTheme({
   lightColors: {
@@ -34,6 +40,9 @@ preventAutoHideAsync();
 export default function App() {
   const [products, setProducts] = useState<Product[]>([]);
   const [visible, setVisible] = useState(false);
+  const [scanProductVisible, setScanProductVisible] = useState(false);
+  const [barCode, setBarCode] = useState<BarCode | null>(null);
+  const queryClient = new QueryClient();
 
   const [dbInitialized, setDbInitialized] = useState(false);
 
@@ -73,12 +82,22 @@ export default function App() {
     return null;
   }
 
-  function deleteItem(id: string) {
-    setProducts((currentProducts) => currentProducts.filter((product) => product.id !== id));
-  }
+  const deleteItem = async (id: string) => {
+    await deleteProduct(id);
+    await loadProducts();
+  };
 
   const toggleOverlay = () => {
     setVisible(!visible);
+  };
+
+  const onBarCodeScanned = (barCode: BarCode) => {
+    setBarCode(barCode);
+    setScanProductVisible(false);
+  };
+
+  const toggleScanProduct = () => {
+    setScanProductVisible(!scanProductVisible);
   };
 
   const addProduct = async (product: Product) => {
@@ -86,36 +105,45 @@ export default function App() {
     await loadProducts();
     setVisible(false);
   };
-  
-  const deleteProduct = async (id: string) => {
 
+  const clearBarCode = () => {
+    setBarCode(null);
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <View style={styles.appContainer} onLayout={onLayoutRootView}>
-        <Button title="Add New Product" onPress={toggleOverlay} />
-        <AddProductModal
-          visible={visible}
-          toggleOverlay={toggleOverlay}
-          onAddProduct={addProduct}
-        />
-        <View style={styles.goalsContainer}>
-          <FlatList
-            data={products}
-            renderItem={({ item }) => (
-              <ProductListItem
-                productItem={item}
-                // eslint-disable-next-line react/jsx-no-bind
-                onDeleteItem={deleteItem}
-              />
-            )}
-            keyExtractor={(item) => item.id}
-            alwaysBounceVertical={false}
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={theme}>
+        <View style={styles.appContainer} onLayout={onLayoutRootView}>
+          <Button title="Add New Product" onPress={toggleOverlay} />
+          <Button title="Scan product" onPress={toggleScanProduct} />
+          <Scanner
+            visible={scanProductVisible}
+            toggleOverlay={toggleScanProduct}
+            onBarCodeScanned={onBarCodeScanned}
           />
+          <AddProductModal
+            visible={visible}
+            toggleOverlay={toggleOverlay}
+            onAddProduct={addProduct}
+          />
+          {barCode?.data && <QueryData barcode={barCode.data} removeBarCode={clearBarCode} />}
+          <View style={styles.goalsContainer}>
+            <FlatList
+              data={products}
+              renderItem={({ item }) => (
+                <ProductListItem
+                  productItem={item}
+                  // eslint-disable-next-line react/jsx-no-bind
+                  onDeleteItem={deleteItem}
+                />
+              )}
+              keyExtractor={(item) => item.id}
+              alwaysBounceVertical={false}
+            />
+          </View>
         </View>
-      </View>
-    </ThemeProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 
@@ -124,6 +152,8 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 50,
     paddingHorizontal: 16,
+    justifyContent: 'space-between',
+    display: 'flex',
   },
   goalsContainer: {
     flex: 5,

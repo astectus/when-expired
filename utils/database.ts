@@ -78,3 +78,23 @@ export function fetchProducts(): Promise<Product[]> {
 
   return promise;
 }
+
+export function deleteProduct(id: string) {
+  const promise = new Promise((resolve, reject) => {
+    database.transaction((tx) => {
+      tx.executeSql(
+        `DELETE FROM products WHERE id = ?;`,
+        [id],
+        (_, result) => {
+          resolve(result);
+        },
+        (_, err) => {
+          reject(err);
+          return true;
+        }
+      );
+    });
+  });
+
+  return promise;
+}

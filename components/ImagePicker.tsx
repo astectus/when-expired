@@ -3,8 +3,13 @@ import { View, Alert, StyleSheet, Image } from 'react-native';
 import { launchCameraAsync, PermissionStatus, useCameraPermissions } from 'expo-image-picker';
 import { useState } from 'react';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { isImage } from '../utils/typeChecker';
 
-export default function ImagePicker() {
+export default function ImagePicker({
+  onImagePicked,
+}: {
+  onImagePicked: (imageUri: string) => void;
+}) {
   const [cameraPermission, askForCameraPermission] = useCameraPermissions();
   const [imageUri, setImageUri] = useState<string | null>(null);
 
@@ -36,7 +41,10 @@ export default function ImagePicker() {
       quality: 0.5,
     });
 
-    setImageUri(image.uri);
+    if (isImage(image)) {
+      setImageUri(image.uri);
+      onImagePicked(image.uri);
+    }
   };
 
   let imagePreview = <Text>No image picked yet.</Text>;
@@ -56,7 +64,7 @@ export default function ImagePicker() {
 const style = StyleSheet.create({
   imagePreview: {
     width: '100%',
-    height: 200,
+    height: 150,
     marginVertical: 10,
     justifyContent: 'center',
     alignItems: 'center',

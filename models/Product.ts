@@ -11,8 +11,8 @@ export default class Product {
 
      public description?: string;
 
-     constructor(id: string, name: string, expirationDate: string, price?: string, photoUri?: string, description?: string) {
-           this.id = id;
+     constructor(name: string, expirationDate: string, price?: string, photoUri?: string, description?: string) {
+           this.id = Math.random().toString();
            this.name = name;
            this.expirationDate = expirationDate // new Date(expirationDate);
            this.price = price;

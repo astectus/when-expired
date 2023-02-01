@@ -8,13 +8,24 @@ export default function ProductListItem({
   onDeleteItem: (id: string) => void;
   productItem: Product;
 }) {
+  const avatar = productItem.photoUri ? (
+    <Avatar
+      source={{
+        uri: productItem.photoUri,
+      }}
+      size="large"
+      title="LW"
+      onPress={() => console.log('Works!')}
+    />
+  ) : null;
+
   return (
     <ListItem bottomDivider>
-      <Avatar rounded />
+      {avatar}
       <ListItem.Content>
         <ListItem.Title>{productItem.name}</ListItem.Title>
         <ListItem.Subtitle>{productItem.description}</ListItem.Subtitle>
-        <Button onPress={() => onDeleteItem(productItem.id)}> Delete Ite</Button>
+        <Button onPress={() => onDeleteItem(productItem.id)}> Delete Item</Button>
       </ListItem.Content>
     </ListItem>
   );
