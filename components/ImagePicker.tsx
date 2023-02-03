@@ -1,5 +1,5 @@
-import { Button, Text } from '@rneui/base';
 import { View, Alert, StyleSheet, Image } from 'react-native';
+import { Button, Text } from 'react-native-paper';
 import { launchCameraAsync, PermissionStatus, useCameraPermissions } from 'expo-image-picker';
 import { useState } from 'react';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
@@ -56,7 +56,7 @@ export default function ImagePicker({
   return (
     <View>
       <View style={style.imagePreview}>{imagePreview}</View>
-      <Button title="Take Image" onPress={takeImageHandler} />
+      <Button onPress={takeImageHandler}>Take Image</Button>
     </View>
   );
 }

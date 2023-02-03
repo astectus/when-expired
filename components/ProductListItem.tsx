@@ -1,4 +1,4 @@
-import { ListItem, Avatar, Button } from '@rneui/base';
+import { List, Avatar, Button } from 'react-native-paper';
 import Product from '../models/Product';
 
 export default function ProductListItem({
@@ -8,25 +8,24 @@ export default function ProductListItem({
   onDeleteItem: (id: string) => void;
   productItem: Product;
 }) {
-  const avatar = productItem.photoUri ? (
-    <Avatar
-      source={{
-        uri: productItem.photoUri,
-      }}
-      size="large"
-      title="LW"
-      onPress={() => console.log('Works!')}
-    />
-  ) : null;
+  const avatar = () =>
+    productItem.photoUri ? (
+      <Avatar.Image
+        source={{
+          uri: productItem.photoUri,
+        }}
+        size={50}
+      />
+    ) : null;
+
+  const button = () => <Button onPress={() => onDeleteItem(productItem.id)}> Delete Item</Button>;
 
   return (
-    <ListItem bottomDivider>
-      {avatar}
-      <ListItem.Content>
-        <ListItem.Title>{productItem.name}</ListItem.Title>
-        <ListItem.Subtitle>{productItem.description}</ListItem.Subtitle>
-        <Button onPress={() => onDeleteItem(productItem.id)}> Delete Item</Button>
-      </ListItem.Content>
-    </ListItem>
+    <List.Item
+      title={productItem.name}
+      description={productItem.description}
+      left={avatar}
+      right={button}
+    />
   );
 }

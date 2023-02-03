@@ -24,6 +24,7 @@
         // "react-native/no-color-literals": 2,
         // "react-native/no-raw-text": 2,
         "react-native/no-single-element-style-arrays": 2,
+        "react/no-unstable-nested-components": "off",
         "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
         "react/react-in-jsx-scope": "off",
         "no-underscore-dangle":"off",

@@ -1,39 +1,25 @@
 import { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, View, FlatList, Platform } from 'react-native';
-import { createTheme, ThemeProvider, lightColors, darkColors, Button } from '@rneui/themed';
+import { StyleSheet, View, FlatList } from 'react-native';
 import { preventAutoHideAsync, hideAsync } from 'expo-splash-screen';
-
 import { QueryClientProvider, QueryClient } from 'react-query';
+import { Provider as PaperProvider, DefaultTheme, Button } from 'react-native-paper';
+
 import AddProductModal from './components/AddProductModal';
 import ProductListItem from './components/ProductListItem';
 import Product from './models/Product';
 import { init, insertProduct, fetchProducts, deleteProduct } from './utils/database';
 import Scanner from './components/Scanner';
 import { BarCode } from './models/BarCode';
-import { getProductByBarcode } from './api/api';
-import { useQuery } from 'react-query';
 import QueryData from './components/QueryData';
 
-const theme = createTheme({
-  lightColors: {
-    ...Platform.select({
-      default: lightColors.platform.android,
-      ios: lightColors.platform.ios,
-    }),
+const theme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: 'tomato',
+    secondary: 'yellow',
   },
-  darkColors: {
-    ...Platform.select({
-      default: darkColors.platform.android,
-      ios: darkColors.platform.ios,
-    }),
-  },
-  mode: 'light',
-  components: {
-    Button: {
-      raised: true,
-    },
-  },
-});
+};
 
 preventAutoHideAsync();
 
@@ -112,10 +98,10 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
+      <PaperProvider theme={theme}>
         <View style={styles.appContainer} onLayout={onLayoutRootView}>
-          <Button title="Add New Product" onPress={toggleOverlay} />
-          <Button title="Scan product" onPress={toggleScanProduct} />
+          <Button onPress={toggleOverlay}>Add New Product</Button>
+          <Button onPress={toggleScanProduct}>Scan product</Button>
           <Scanner
             visible={scanProductVisible}
             toggleOverlay={toggleScanProduct}
@@ -142,7 +128,7 @@ export default function App() {
             />
           </View>
         </View>
-      </ThemeProvider>
+      </PaperProvider>
     </QueryClientProvider>
   );
 }

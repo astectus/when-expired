@@ -1,7 +1,7 @@
 import { DateTimePickerAndroid, DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import { Button, Icon, Text } from '@rneui/base';
 import { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
+import { Text, IconButton } from 'react-native-paper';
 
 export default function DatePicker() {
   const [date, setDate] = useState(new Date());
@@ -26,9 +26,7 @@ export default function DatePicker() {
       <Text onPress={showDatePicker} style={styles.datePickerValue}>
         {new Date(date).toDateString()}
       </Text>
-      <Button radius="sm" type="solid" onPress={showDatePicker}>
-        <Icon name="calendar" type="font-awesome" color="white" />
-      </Button>
+      <IconButton icon="calendar" onPress={showDatePicker} />
     </View>
   );
 }

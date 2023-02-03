@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Button } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import { Overlay } from '@rneui/base';
+import { Dialog } from 'react-native-paper';
 import { BarCode } from '../models/BarCode';
 
 export default function Scanner({
@@ -18,6 +18,7 @@ export default function Scanner({
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
+      // @ts-ignore
       setHasPermission(status === 'granted');
     };
 
@@ -36,7 +37,7 @@ export default function Scanner({
   }
 
   return (
-    <Overlay isVisible={visible} onBackdropPress={toggleOverlay} overlayStyle={styles.overlay}>
+    <Dialog visible={visible} onDismiss={toggleOverlay} style={styles.overlay}>
       <View style={styles.scannerContainer}>
         <Text>Scan product barcode</Text>
         <BarCodeScanner
@@ -44,7 +45,7 @@ export default function Scanner({
           style={StyleSheet.absoluteFillObject}
         />
       </View>
-    </Overlay>
+    </Dialog>
   );
 }
 
