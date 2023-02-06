@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Dialog } from 'react-native-paper';
-import { BarCode } from '../models/BarCode';
+import { BarCode } from '../../models/BarCode';
 
 export default function Scanner({
   visible,

@@ -1,10 +1,10 @@
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useState } from 'react';
 import { Dialog, Text, Button, TextInput, Portal } from 'react-native-paper';
-import Product from '../models/Product';
+import Product from '../../models/Product';
 import ImagePicker from './ImagePicker';
 import DatePicker from './DatePicker';
-import { isProduct } from '../utils/typeChecker';
+import { isProduct } from '../../utils/typeChecker';
 
 export default function AddProductModal({
   visible,

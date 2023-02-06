@@ -1,5 +1,5 @@
 import { List, Avatar, Button } from 'react-native-paper';
-import Product from '../models/Product';
+import Product from '../../models/Product';
 
 export default function ProductListItem({
   onDeleteItem,

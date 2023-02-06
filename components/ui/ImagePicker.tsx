@@ -3,7 +3,7 @@ import { Button, Text } from 'react-native-paper';
 import { launchCameraAsync, PermissionStatus, useCameraPermissions } from 'expo-image-picker';
 import { useState } from 'react';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-import { isImage } from '../utils/typeChecker';
+import { isImage } from '../../utils/typeChecker';
 
 export default function ImagePicker({
   onImagePicked,

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useQuery } from 'react-query';
-import { getProductByBarcode } from '../api/api';
+import { getProductByBarcode } from '../../api/api';
 
 export default function QueryData({
   barcode,
