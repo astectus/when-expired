@@ -1,5 +1,6 @@
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, View } from 'react-native';
 import { Button } from 'react-native-paper';
+import { useEffect, useState } from 'react';
 import Scanner from '../components/ui/Scanner';
 import AddProductModal from '../components/ui/AddProductModal';
 import QueryData from '../components/ui/QueryData';
@@ -7,7 +8,6 @@ import ProductListItem from '../components/ui/ProductListItem';
 import { deleteProduct, fetchProducts, insertProduct } from '../utils/database';
 import { BarCode } from '../models/BarCode';
 import Product from '../models/Product';
-import { useEffect, useState } from 'react';
 
 export default function HomeScreen() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -63,7 +63,7 @@ export default function HomeScreen() {
       />
       <AddProductModal visible={visible} toggleOverlay={toggleOverlay} onAddProduct={addProduct} />
       {barCode?.data && <QueryData barcode={barCode.data} removeBarCode={clearBarCode} />}
-      <View style={styles.goalsContainer}>
+      <View>
         <FlatList
           data={products}
           renderItem={({ item }) => (
@@ -80,9 +80,3 @@ export default function HomeScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  goalsContainer: {
-    flex: 5,
-  },
-});

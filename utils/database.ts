@@ -57,14 +57,14 @@ export function fetchProducts(): Promise<Product[]> {
         (_, result) => {
           const products = result.rows._array.map(
             (dp) =>
-              new Product(
-                dp.id.toString(),
-                dp.name,
-                dp.expirationDate,
-                dp.price,
-                dp.photoUri,
-                dp.description
-              )
+              new Product({
+                id: dp.id.toString(),
+                name: dp.name,
+                expirationDate: dp.expirationDate,
+                price: dp.price,
+                photoUri: dp.photoUri,
+                description: dp.description,
+              })
           );
           resolve(products);
         },

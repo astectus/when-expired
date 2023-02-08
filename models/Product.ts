@@ -1,22 +1,25 @@
+interface NewProduct extends Omit<Product, 'id'> {
+  id?: string;
+}
 export default class Product {
-     public id: string;
+  public id: string;
 
-     public name: string;
+  public name: string;
 
-     public expirationDate: string // Date;
+  public expirationDate: string; // Date;
 
-     public price?: string;
+  public price?: string;
 
-     public photoUri?: string;
+  public photoUri?: string;
 
-     public description?: string;
+  public description?: string;
 
-     constructor(name: string, expirationDate: string, price?: string, photoUri?: string, description?: string) {
-           this.id = Math.random().toString();
-           this.name = name;
-           this.expirationDate = expirationDate // new Date(expirationDate);
-           this.price = price;
-           this.photoUri = photoUri;
-           this.description = description;
-     }
+  constructor(data: NewProduct) {
+    this.id = data.id || Math.random().toString();
+    this.name = data.name;
+    this.expirationDate = data.expirationDate; // new Date(expirationDate);
+    this.price = data.price;
+    this.photoUri = data.photoUri;
+    this.description = data.description;
+  }
 }
