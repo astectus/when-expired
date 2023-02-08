@@ -2,19 +2,15 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import FavoriteScreen from '../../pages/FavoriteScreen';
-import AppStacks from './AppStacks';
+import HomeScreen from '../../pages/HomeScreen';
 
 const Tab = createMaterialBottomTabNavigator();
-export default function AppTabs() {
+export default function HomeTabs() {
   return (
-    <Tab.Navigator
-      initialRouteName="Feed"
-      activeColor="#e91e63"
-      barStyle={{ backgroundColor: 'tomato' }}
-    >
+    <Tab.Navigator activeColor="#e91e63" barStyle={{ backgroundColor: 'tomato' }}>
       <Tab.Screen
-        name="StackRoutes"
-        component={AppStacks}
+        name="Home"
+        component={HomeScreen}
         options={{
           tabBarLabel: 'Home',
           tabBarIcon: ({ color }) => <MaterialCommunityIcons name="home" color={color} size={26} />,

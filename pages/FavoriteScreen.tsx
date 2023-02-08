@@ -1,9 +1,13 @@
-import { Text, View } from 'react-native';
+import { Text } from 'react-native-paper';
+import { View } from 'react-native';
+import NoHeaderScreen from '../components/layout/NoHeaderScreen';
 
 export default function FavoriteScreen() {
   return (
-    <View>
-      <Text>Favorite Screen</Text>
-    </View>
+    <NoHeaderScreen>
+      <View>
+        <Text>Favorite Screen</Text>
+      </View>
+    </NoHeaderScreen>
   );
 }

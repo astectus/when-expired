@@ -5,8 +5,9 @@ import { QueryClientProvider, QueryClient } from 'react-query';
 import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 
 import { init } from './utils/database';
-import AppTabs from './components/navigation/AppTabs';
+import HomeTabs from './components/navigation/HomeTabs';
 import { NavigationContainer } from '@react-navigation/native';
+import AppStacks from './components/navigation/AppStacks';
 
 const theme = {
   ...DefaultTheme,
@@ -53,7 +54,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <PaperProvider theme={theme}>
         <NavigationContainer onReady={onLayoutRootView}>
-          <AppTabs />
+          <AppStacks />
         </NavigationContainer>
       </PaperProvider>
     </QueryClientProvider>
