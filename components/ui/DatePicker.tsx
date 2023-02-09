@@ -1,10 +1,11 @@
 import { DateTimePickerAndroid, DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text, IconButton } from 'react-native-paper';
+import { IconButton, Text } from 'react-native-paper';
+import TimeLeft from './TimeLeft';
 
 export default function DatePicker() {
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState<Date | undefined>(undefined);
 
   const onChange = (event: DateTimePickerEvent, selectedDate: Date | undefined) => {
     if (selectedDate && selectedDate instanceof Date) {
@@ -14,18 +15,19 @@ export default function DatePicker() {
 
   const showDatePicker = () => {
     DateTimePickerAndroid.open({
-      value: date,
+      value: new Date(),
       onChange,
       mode: 'date',
       is24Hour: true,
+      minimumDate: new Date(),
     });
   };
 
+  const timeLeft = date ? <TimeLeft expirationDate={date} /> : <Text>No period selected</Text>;
+
   return (
     <View style={styles.datePicker}>
-      <Text onPress={showDatePicker} style={styles.datePickerValue}>
-        {new Date(date).toDateString()}
-      </Text>
+      {timeLeft}
       <IconButton icon="calendar" onPress={showDatePicker} />
     </View>
   );
@@ -39,10 +41,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     alignContent: 'center',
-  },
-  datePickerValue: {
-    fontSize: 18,
-    marginLeft: 10,
-    flexGrow: 1,
   },
 });

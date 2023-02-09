@@ -29,10 +29,7 @@ export default function ScanBarcodeScreen() {
 
   return (
     <View style={styles.scannerContainer}>
-      <BarCodeScanner
-        onBarCodeScanned={handleBarCodeScanned}
-        style={StyleSheet.absoluteFillObject}
-      />
+      <BarCodeScanner onBarCodeScanned={handleBarCodeScanned} style={StyleSheet.absoluteFill} />
     </View>
   );
 }

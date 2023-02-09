@@ -1,13 +1,17 @@
 import { useCallback, useEffect, useState } from 'react';
-import { View } from 'react-native';
 import { preventAutoHideAsync, hideAsync } from 'expo-splash-screen';
 import { QueryClientProvider, QueryClient } from 'react-query';
 import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 
-import { init } from './utils/database';
-import HomeTabs from './components/navigation/HomeTabs';
 import { NavigationContainer } from '@react-navigation/native';
+import { enGB, registerTranslation } from 'react-native-paper-dates';
+import { init } from './utils/database';
 import AppStacks from './components/navigation/AppStacks';
+import 'intl';
+import 'intl/locale-data/jsonp/en';
+
+registerTranslation('en-GB', enGB);
+preventAutoHideAsync();
 
 const theme = {
   ...DefaultTheme,
@@ -17,8 +21,6 @@ const theme = {
     secondary: 'yellow',
   },
 };
-
-preventAutoHideAsync();
 
 export default function App() {
   const queryClient = new QueryClient();

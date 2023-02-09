@@ -6,7 +6,7 @@ export default class Product {
 
   public name: string;
 
-  public expirationDate: string; // Date;
+  public expirationDate: Date;
 
   public price?: string;
 
@@ -17,7 +17,7 @@ export default class Product {
   constructor(data: NewProduct) {
     this.id = data.id || Math.random().toString();
     this.name = data.name;
-    this.expirationDate = data.expirationDate; // new Date(expirationDate);
+    this.expirationDate = data.expirationDate;
     this.price = data.price;
     this.photoUri = data.photoUri;
     this.description = data.description;

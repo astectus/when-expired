@@ -33,7 +33,7 @@ export function insertProduct({ name, expirationDate, price, photoUri, descripti
     database.transaction((tx) => {
       tx.executeSql(
         `INSERT INTO products (name, expirationDate, price, photoUri, description) VALUES (?, ?, ?, ?, ?);`,
-        [name, expirationDate, price || '', photoUri || '', description || ''],
+        [name, expirationDate.toISOString(), price || '', photoUri || '', description || ''],
         (_, result) => {
           resolve(result);
         },
@@ -60,7 +60,7 @@ export function fetchProducts(): Promise<Product[]> {
               new Product({
                 id: dp.id.toString(),
                 name: dp.name,
-                expirationDate: dp.expirationDate,
+                expirationDate: new Date(dp.expirationDate),
                 price: dp.price,
                 photoUri: dp.photoUri,
                 description: dp.description,

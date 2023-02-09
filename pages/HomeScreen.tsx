@@ -2,11 +2,8 @@ import { FlatList, View } from 'react-native';
 import { Button } from 'react-native-paper';
 import { useEffect, useState } from 'react';
 import { NavigationProp } from '@react-navigation/native';
-import Scanner from '../components/ui/Scanner';
-import AddProductModal from '../components/ui/AddProductModal';
-import QueryData from '../components/ui/QueryData';
 import ProductListItem from '../components/ui/ProductListItem';
-import { deleteProduct, fetchProducts, insertProduct } from '../utils/database';
+import { deleteProduct, fetchProducts } from '../utils/database';
 import { BarCode } from '../models/BarCode';
 import Product from '../models/Product';
 import NoHeaderScreen from '../components/layout/NoHeaderScreen';
@@ -50,12 +47,6 @@ export default function HomeScreen({
 
   const toggleScanProduct = () => {
     setScanProductVisible(!scanProductVisible);
-  };
-
-  const addProduct = async (product: Product) => {
-    await insertProduct(product);
-    await loadProducts();
-    setVisible(false);
   };
 
   const clearBarCode = () => {
