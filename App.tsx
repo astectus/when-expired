@@ -9,17 +9,14 @@ import { init } from './utils/database';
 import AppStacks from './components/navigation/AppStacks';
 import 'intl';
 import 'intl/locale-data/jsonp/en';
+import { themeColors } from './constants/themeColors';
 
 registerTranslation('en-GB', enGB);
 preventAutoHideAsync();
 
 const theme = {
   ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: 'tomato',
-    secondary: 'yellow',
-  },
+  colors: themeColors,
 };
 
 export default function App() {

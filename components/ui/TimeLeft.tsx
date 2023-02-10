@@ -3,7 +3,13 @@ import { StyleSheet } from 'react-native';
 import { useMemo } from 'react';
 import { differenceInDays } from '../../utils/differenceBetweenDate';
 
-export default function TimeLeft({ expirationDate }: { expirationDate: Date }) {
+export default function TimeLeft({
+  expirationDate,
+  onPress,
+}: {
+  expirationDate: Date;
+  onPress: () => void;
+}) {
   const daysLeft = useMemo(() => {
     const days = differenceInDays(new Date(), expirationDate);
 
@@ -35,7 +41,11 @@ export default function TimeLeft({ expirationDate }: { expirationDate: Date }) {
     return getLongPeriodText(days);
   }, [expirationDate]);
 
-  return <Text style={styles.datePickerValue}>{daysLeft}</Text>;
+  return (
+    <Text style={styles.datePickerValue} onPress={onPress}>
+      {daysLeft}
+    </Text>
+  );
 }
 
 const styles = StyleSheet.create({

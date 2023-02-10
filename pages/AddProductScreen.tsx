@@ -1,10 +1,9 @@
 import { Button, TextInput } from 'react-native-paper';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, ScrollView } from 'react-native';
 import { useState } from 'react';
-import { DatePickerInput } from 'react-native-paper-dates';
 import { isProduct } from '../utils/typeChecker';
 import DatePicker from '../components/ui/DatePicker';
-import ImagePicker from '../components/ui/ImagePicker';
+import AddImageContainer from '../components/ui/AddImageContainer';
 import Product from '../models/Product';
 import { insertProduct } from '../utils/database';
 
@@ -26,9 +25,9 @@ export default function AddProductScreen() {
 
   // @ts-ignore
   return (
-    <View style={styles.modalForm}>
+    <View style={styles.container}>
       {isProduct(product) && (
-        <View style={styles.modalContainer}>
+        <ScrollView>
           <TextInput
             mode="outlined"
             placeholder="Product name"
@@ -49,11 +48,13 @@ export default function AddProductScreen() {
             onChangeText={(description) => setProduct({ ...product, description })}
           />
           <DatePicker />
-          <ImagePicker onImagePicked={(photoUri) => setProduct({ ...product, photoUri })} />
-        </View>
+          <View style={styles.imageContainer}>
+            <AddImageContainer onImagePicked={(photoUri) => setProduct({ ...product, photoUri })} />
+          </View>
+        </ScrollView>
       )}
       <Button
-        style={styles.modalSubmitButton}
+        style={styles.addProductButton}
         icon="calendar"
         onPress={onSaveProduct}
         mode="contained"
@@ -65,19 +66,17 @@ export default function AddProductScreen() {
 }
 
 const styles = StyleSheet.create({
-  modalContainer: {
-    height: '90%',
+  container: {
     display: 'flex',
     flexDirection: 'column',
+    padding: 10,
+    height: '100%',
   },
-  modalForm: {
-    marginBottom: 20,
+  imageContainer: {
+    margin: 5,
+    height: 300,
   },
-  textPrimary: {
-    textAlign: 'center',
-    fontSize: 20,
-  },
-  modalSubmitButton: {
-    alignSelf: 'flex-end',
+  addProductButton: {
+    margin: 5,
   },
 });

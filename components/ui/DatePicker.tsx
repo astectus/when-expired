@@ -23,7 +23,11 @@ export default function DatePicker() {
     });
   };
 
-  const timeLeft = date ? <TimeLeft expirationDate={date} /> : <Text>No period selected</Text>;
+  const timeLeft = date ? (
+    <TimeLeft expirationDate={date} onPress={showDatePicker} />
+  ) : (
+    <Text>No period selected</Text>
+  );
 
   return (
     <View style={styles.datePicker}>
@@ -41,5 +45,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     alignContent: 'center',
+    borderStyle: 'solid',
+    borderRadius: 5,
+    borderWidth: 1,
+    marginTop: 5,
+    paddingLeft: 15,
   },
 });
