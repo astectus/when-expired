@@ -1,5 +1,6 @@
-interface NewProduct extends Omit<Product, 'id'> {
+export interface NewProduct extends Omit<Product, 'id' | 'expirationDate'> {
   id?: string;
+  expirationDate?: Date;
 }
 export default class Product {
   public id: string;
@@ -17,7 +18,7 @@ export default class Product {
   constructor(data: NewProduct) {
     this.id = data.id || Math.random().toString();
     this.name = data.name;
-    this.expirationDate = data.expirationDate;
+    this.expirationDate = data.expirationDate ? data.expirationDate : new Date();
     this.price = data.price;
     this.photoUri = data.photoUri;
     this.description = data.description;

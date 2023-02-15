@@ -4,8 +4,8 @@ import { View, StyleSheet } from 'react-native';
 import { IconButton, Text } from 'react-native-paper';
 import TimeLeft from './TimeLeft';
 
-export default function DatePicker() {
-  const [date, setDate] = useState<Date | undefined>(undefined);
+export default function DatePicker({ defaultDate }: { defaultDate: Date | undefined }) {
+  const [date, setDate] = useState<Date | undefined>(defaultDate || undefined);
 
   const onChange = (event: DateTimePickerEvent, selectedDate: Date | undefined) => {
     if (selectedDate && selectedDate instanceof Date) {

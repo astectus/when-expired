@@ -10,6 +10,7 @@ import AppStacks from './components/navigation/AppStacks';
 import 'intl';
 import 'intl/locale-data/jsonp/en';
 import { themeColors } from './constants/themeColors';
+import ProductsContextProvider, { ProductsContext } from './state/context/products-context';
 
 registerTranslation('en-GB', enGB);
 preventAutoHideAsync();
@@ -53,7 +54,9 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <PaperProvider theme={theme}>
         <NavigationContainer onReady={onLayoutRootView}>
-          <AppStacks />
+          <ProductsContextProvider>
+            <AppStacks />
+          </ProductsContextProvider>
         </NavigationContainer>
       </PaperProvider>
     </QueryClientProvider>

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { Text, View, StyleSheet, Alert } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
+import { ProductsContext } from '../state/context/products-context';
 
-export default function ScanBarcodeScreen() {
+export default function ScanBarcodeScreen({ navigation: { navigate } }: { navigation: any }) {
   const [hasPermission, setHasPermission] = useState(null);
 
   useEffect(() => {
@@ -15,9 +16,9 @@ export default function ScanBarcodeScreen() {
     getBarCodeScannerPermissions();
   }, []);
 
-  const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
-    //go to steps page.
-    console.log(type, data);
+  const handleBarCodeScanned = async ({ data }: { data: string }) => {
+    if (data === null) return;
+    navigate('Add product', { barcode: data });
   };
 
   if (hasPermission === null) {

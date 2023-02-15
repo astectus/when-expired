@@ -8,11 +8,13 @@ import { themeColors } from '../../constants/themeColors';
 
 export default function AddImageContainer({
   onImagePicked,
+  defaultImageUri,
 }: {
   onImagePicked: (imageUri: string) => void;
+  defaultImageUri?: string;
 }) {
   const [cameraPermission, askForCameraPermission] = useCameraPermissions();
-  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [imageUri, setImageUri] = useState<string | null>(defaultImageUri || null);
 
   const verifyPermissions = async () => {
     if (cameraPermission?.status === PermissionStatus.UNDETERMINED) {
