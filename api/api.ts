@@ -16,5 +16,9 @@ export async function getProductByBarcode(barcode: string): Promise<NewProduct |
   const response = await axios(options);
   const data = await response.data;
 
+  if (data?.results?.length === 0) {
+    return null;
+  }
+
   return productMap(data);
 }

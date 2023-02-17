@@ -10,7 +10,7 @@ import AppStacks from './components/navigation/AppStacks';
 import 'intl';
 import 'intl/locale-data/jsonp/en';
 import { themeColors } from './constants/themeColors';
-import ProductsContextProvider, { ProductsContext } from './state/context/products-context';
+import ProductsContextProvider from './state/context/products-context';
 
 registerTranslation('en-GB', enGB);
 preventAutoHideAsync();
@@ -51,6 +51,7 @@ export default function App() {
   }
 
   return (
+    // @ts-ignore
     <QueryClientProvider client={queryClient}>
       <PaperProvider theme={theme}>
         <NavigationContainer onReady={onLayoutRootView}>

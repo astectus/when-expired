@@ -1,7 +1,7 @@
 import { View, Alert, StyleSheet, Image, Text } from 'react-native';
 import { Button } from 'react-native-paper';
 import { launchCameraAsync, PermissionStatus, useCameraPermissions } from 'expo-image-picker';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import { isImage } from '../../utils/typeChecker';
 import { themeColors } from '../../constants/themeColors';
@@ -14,7 +14,13 @@ export default function AddImageContainer({
   defaultImageUri?: string;
 }) {
   const [cameraPermission, askForCameraPermission] = useCameraPermissions();
-  const [imageUri, setImageUri] = useState<string | null>(defaultImageUri || null);
+  const [imageUri, setImageUri] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (defaultImageUri) {
+      setImageUri(defaultImageUri);
+    }
+  }, [defaultImageUri]);
 
   const verifyPermissions = async () => {
     if (cameraPermission?.status === PermissionStatus.UNDETERMINED) {
