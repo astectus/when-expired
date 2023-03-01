@@ -3,6 +3,7 @@ import SelectMethodScreen from '../../pages/SelectMethodScreen';
 import ScanBarcodeScreen from '../../pages/ScanBarcodeScreen';
 import AddProductScreen from '../../pages/AddProductScreen';
 import HomeTabs from './HomeTabs';
+import ProductScreen from '../../pages/ProductScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -12,6 +13,7 @@ export default function AppStacks() {
       <Stack.Screen name="Select method" component={SelectMethodScreen} />
       <Stack.Screen name="Add product" component={AddProductScreen} />
       <Stack.Screen name="Scan barcode" component={ScanBarcodeScreen} />
+      <Stack.Screen name="Product" component={ProductScreen} />
       <Stack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false }} />
     </Stack.Navigator>
   );

@@ -1,4 +1,4 @@
-import { FlatList, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { Button } from 'react-native-paper';
 import { useContext } from 'react';
 import { NavigationProp } from '@react-navigation/native';
@@ -25,14 +25,14 @@ export default function HomeScreen({
     <NoHeaderScreen>
       <View>
         <Button onPress={goToAddProductScreen}>Add New Product</Button>
-        <View>
+        <View style={styles.listContainer}>
           <FlatList
             data={products}
             renderItem={({ item }) => (
               <ProductListItem
                 productItem={item}
-                // eslint-disable-next-line react/jsx-no-bind
-                onDeleteItem={deleteItem}
+                onSelectProduct={() => navigate('Product', { id: item.id })}
+                onDeleteItem={() => deleteItem(item.id)}
               />
             )}
             keyExtractor={(item) => item.id}
@@ -43,3 +43,10 @@ export default function HomeScreen({
     </NoHeaderScreen>
   );
 }
+
+const styles = StyleSheet.create({
+  listContainer: {
+    marginLeft: 5,
+    marginRight: 5,
+  },
+});

@@ -1,14 +1,14 @@
 import { Text } from 'react-native-paper';
 import { StyleSheet } from 'react-native';
 import { useMemo } from 'react';
-import { differenceInDays } from '../../utils/differenceBetweenDate';
+import { differenceInDays } from '../../utils/date';
 
 export default function TimeLeft({
   expirationDate,
   onPress,
 }: {
   expirationDate: Date;
-  onPress: () => void;
+  onPress?: () => void;
 }) {
   const daysLeft = useMemo(() => {
     const days = differenceInDays(new Date(), expirationDate);
@@ -31,8 +31,12 @@ export default function TimeLeft({
         return 'One day left';
       }
 
-      if (days <= 0) {
+      if (days === 0) {
         return 'Expires today';
+      }
+
+      if (days < 0) {
+        return 'Expired';
       }
 
       return `${days} days left`;
