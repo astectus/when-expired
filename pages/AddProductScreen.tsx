@@ -1,9 +1,8 @@
-import { Button, TextInput, IconButton } from 'react-native-paper';
+import { Button, TextInput } from 'react-native-paper';
 import { StyleSheet, View, ScrollView, Alert } from 'react-native';
 import { useContext, useEffect, useState } from 'react';
 import { NavigationProp } from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { isProduct } from '../utils/typeChecker';
 import DatePicker from '../components/ui/DatePicker';
 import AddImageContainer from '../components/ui/AddImageContainer';
@@ -46,20 +45,6 @@ export default function AddProductScreen({
       setIsLoading(false);
     }
   }, []);
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => (
-        <View style={styles.backButtonContainer}>
-          <IconButton
-            style={styles.backButton}
-            icon={() => <MaterialCommunityIcons name="arrow-left" size={24} />}
-            onPress={() => navigation.navigate('Select method')}
-          />
-        </View>
-      ),
-    });
-  }, [navigation]);
 
   const onSaveProduct = async () => {
     if (isProduct(product)) {

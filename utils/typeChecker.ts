@@ -19,6 +19,10 @@ export function isNewProduct(object: unknown): object is Product {
   return false;
 }
 
+export function isString(object: unknown): object is string {
+  return object !== null && typeof object === 'string';
+}
+
 export function isImage(object: unknown): object is Image {
   if (object !== null && typeof object === 'object') {
     // @ts-ignore
