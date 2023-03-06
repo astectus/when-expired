@@ -3,10 +3,22 @@ import Product from '../models/Product';
 
 const database = SQLite.openDatabase('places.db');
 
-export function init() {
+export const init = async () => {
   const promise = new Promise((resolve, reject) => {
-    database.transaction((tx) => {
-      tx.executeSql(
+    database.transaction(async (tx) => {
+      await tx.executeSql(
+        `CREATE TABLE IF NOT EXISTS categories (
+                         id INTEGER PRIMARY KEY NOT NULL, 
+                         name TEXT NOT NULL,
+                         );`,
+        [],
+        () => resolve(true),
+        (_, err) => {
+          reject(err);
+          return true;
+        }
+      );
+      await tx.executeSql(
         `CREATE TABLE IF NOT EXISTS products (
                          id INTEGER PRIMARY KEY NOT NULL, 
                          name TEXT NOT NULL, 
@@ -26,7 +38,7 @@ export function init() {
   });
 
   return promise;
-}
+};
 
 export function insertProductDb({ name, expirationDate, price, photoUri, description }: Product) {
   const promise = new Promise((resolve, reject) => {
