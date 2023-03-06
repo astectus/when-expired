@@ -15,6 +15,8 @@ export default class Product {
 
   public description?: string;
 
+  public isFavorite?: boolean;
+
   constructor(data: NewProduct) {
     this.id = data.id || Math.random().toString();
     this.name = data.name;

@@ -39,4 +39,5 @@ export const themeColors = {
   surfaceDisabled: 'rgba(25, 28, 28, 0.12)',
   onSurfaceDisabled: 'rgba(25, 28, 28, 0.38)',
   backdrop: 'rgba(41, 50, 50, 0.4)',
+  favorite: 'rgb(255,242,0)',
 };

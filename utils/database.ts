@@ -28,7 +28,7 @@ export function init() {
   return promise;
 }
 
-export function insertProduct({ name, expirationDate, price, photoUri, description }: Product) {
+export function insertProductDb({ name, expirationDate, price, photoUri, description }: Product) {
   const promise = new Promise((resolve, reject) => {
     database.transaction((tx) => {
       tx.executeSql(
@@ -48,7 +48,34 @@ export function insertProduct({ name, expirationDate, price, photoUri, descripti
   return promise;
 }
 
-export function fetchProducts(): Promise<Product[]> {
+export function updateProductDb({
+  id,
+  name,
+  expirationDate,
+  price,
+  photoUri,
+  description,
+}: Product) {
+  const promise = new Promise((resolve, reject) => {
+    database.transaction((tx) => {
+      tx.executeSql(
+        `UPDATE products SET name = ?, expirationDate = ?, price = ?, photoUri = ?, description = ? WHERE id = ?;`,
+        [name, expirationDate.toISOString(), price || '', photoUri || '', description || '', id],
+        (_, result) => {
+          resolve(result);
+        },
+        (_, err) => {
+          reject(err);
+          return true;
+        }
+      );
+    });
+  });
+
+  return promise;
+}
+
+export function fetchProductsDb(): Promise<Product[]> {
   const promise = new Promise<Product[]>((resolve, reject) => {
     database.transaction((tx) => {
       tx.executeSql(
@@ -79,7 +106,7 @@ export function fetchProducts(): Promise<Product[]> {
   return promise;
 }
 
-export function deleteProduct(id: string) {
+export function deleteProductDb(id: string) {
   const promise = new Promise((resolve, reject) => {
     database.transaction((tx) => {
       tx.executeSql(

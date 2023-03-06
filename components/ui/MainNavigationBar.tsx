@@ -1,12 +1,18 @@
 import { Appbar } from 'react-native-paper';
-import { NavigationProp, ParamListBase, RouteProp } from '@react-navigation/native';
-import { ScreenProps } from 'react-native-screens';
+import { ParamListBase, Route } from '@react-navigation/native';
 import {
-  NativeStackHeaderProps,
   NativeStackNavigationOptions,
   NativeStackNavigationProp,
 } from '@react-navigation/native-stack';
-import { isString } from '../../utils/typeChecker';
+import { useContext, useEffect, useState } from 'react';
+import { isProduct, isString } from '../../utils/typeChecker';
+import Product from '../../models/Product';
+import { FavoriteIcon } from './FavoriteIcon';
+import { ProductsContext } from '../../state/context/products-context';
+
+const customBackRoutes: Record<string, string> = {
+  'Add product': 'Select method',
+};
 
 export default function MainNavigationBar({
   navigation,
@@ -15,10 +21,22 @@ export default function MainNavigationBar({
 }: {
   navigation: NativeStackNavigationProp<ParamListBase>;
   options: NativeStackNavigationOptions;
-  route: RouteProp<ParamListBase>;
+  route: Route<string, any>;
 }) {
-  const customBackRoutes: Record<string, string> = {
-    'Add product': 'Select method',
+  const { updateProduct } = useContext(ProductsContext);
+
+  const [product, setProduct] = useState<Product | undefined>(undefined);
+
+  useEffect(() => {
+    if (route.name === 'Product' && isProduct(route.params?.product)) {
+      setProduct(route.params?.product);
+    }
+  }, []);
+
+  const toggleFavorite = async (product: Product) => {
+    const updatedProduct = { ...product, isFavorite: !product.isFavorite };
+    await updateProduct(updatedProduct);
+    setProduct(updatedProduct);
   };
 
   const title = isString(options?.headerTitle) || route.name;
@@ -29,6 +47,12 @@ export default function MainNavigationBar({
     <Appbar.Header>
       <Appbar.BackAction onPress={backCallback} />
       <Appbar.Content title={title} />
+      {product && (
+        <Appbar.Action
+          icon={() => <FavoriteIcon product={product} />}
+          onPress={() => toggleFavorite(product)}
+        />
+      )}
     </Appbar.Header>
   );
 }
