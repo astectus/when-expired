@@ -1,32 +1,37 @@
 import * as SQLite from 'expo-sqlite';
 import Product from '../models/Product';
+import { Category, NewCategory } from '../models/Category';
+import { isCategoryList } from './typeChecker';
 
 const database = SQLite.openDatabase('places.db');
 
-export const init = async () => {
-  const promise = new Promise((resolve, reject) => {
-    database.transaction(async (tx) => {
-      await tx.executeSql(
+export const init = () =>
+  new Promise((resolve, reject) => {
+    database.transaction((tx) => {
+      tx.executeSql(
         `CREATE TABLE IF NOT EXISTS categories (
                          id INTEGER PRIMARY KEY NOT NULL, 
-                         name TEXT NOT NULL,
-                         );`,
-        [],
-        () => resolve(true),
-        (_, err) => {
-          reject(err);
-          return true;
-        }
-      );
-      await tx.executeSql(
-        `CREATE TABLE IF NOT EXISTS products (
+                         name TEXT NOT NULL
+                         );                      
+                     CREATE TABLE IF NOT EXISTS products (
                          id INTEGER PRIMARY KEY NOT NULL, 
                          name TEXT NOT NULL, 
                          expirationDate TEXT NOT NULL, 
                          price TEXT, 
                          photoUri TEXT, 
                          description TEXT
-                         );`,
+                         );   
+                     CREATE TABLE IF NOT EXISTS productCategories (
+                          CONSTRAINT fk_product
+                               FOREIGN KEY (productId)
+                               REFERENCES products(id)
+                               ON DELETE CASCADE,
+                           CONSTRAINT fk_category
+                               FOREIGN KEY (categoryId)
+                               REFERENCES category(id)
+                               ON DELETE CASCADE
+                               );                                 
+                         `,
         [],
         () => resolve(true),
         (_, err) => {
@@ -37,11 +42,8 @@ export const init = async () => {
     });
   });
 
-  return promise;
-};
-
 export function insertProductDb({ name, expirationDate, price, photoUri, description }: Product) {
-  const promise = new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     database.transaction((tx) => {
       tx.executeSql(
         `INSERT INTO products (name, expirationDate, price, photoUri, description) VALUES (?, ?, ?, ?, ?);`,
@@ -56,8 +58,6 @@ export function insertProductDb({ name, expirationDate, price, photoUri, descrip
       );
     });
   });
-
-  return promise;
 }
 
 export function updateProductDb({
@@ -68,7 +68,7 @@ export function updateProductDb({
   photoUri,
   description,
 }: Product) {
-  const promise = new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     database.transaction((tx) => {
       tx.executeSql(
         `UPDATE products SET name = ?, expirationDate = ?, price = ?, photoUri = ?, description = ? WHERE id = ?;`,
@@ -83,12 +83,10 @@ export function updateProductDb({
       );
     });
   });
-
-  return promise;
 }
 
 export function fetchProductsDb(): Promise<Product[]> {
-  const promise = new Promise<Product[]>((resolve, reject) => {
+  return new Promise<Product[]>((resolve, reject) => {
     database.transaction((tx) => {
       tx.executeSql(
         `SELECT * FROM products;`,
@@ -114,12 +112,10 @@ export function fetchProductsDb(): Promise<Product[]> {
       );
     });
   });
-
-  return promise;
 }
 
 export function deleteProductDb(id: string) {
-  const promise = new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     database.transaction((tx) => {
       tx.executeSql(
         `DELETE FROM products WHERE id = ?;`,
@@ -134,6 +130,61 @@ export function deleteProductDb(id: string) {
       );
     });
   });
+}
 
-  return promise;
+export function insertCategoryDb({ name }: NewCategory) {
+  return new Promise((resolve, reject) => {
+    database.transaction((tx) => {
+      tx.executeSql(
+        `INSERT INTO categories (name) VALUES (?);`,
+        [name],
+        (_, result) => {
+          resolve(result);
+        },
+        (_, err) => {
+          reject(err);
+          return true;
+        }
+      );
+    });
+  });
+}
+
+export function fetchCategoriesDb(): Promise<Category[]> {
+  return new Promise<Category[]>((resolve, reject) => {
+    database.transaction((tx) => {
+      tx.executeSql(
+        `SELECT * FROM categories;`,
+        [],
+        (_, result) => {
+          if (isCategoryList(result.rows._array)) {
+            resolve(result.rows._array);
+          }
+          resolve([]);
+        },
+        (_, err) => {
+          reject(err);
+          return true;
+        }
+      );
+    });
+  });
+}
+
+export function deleteCategoryDb(id: string) {
+  return new Promise((resolve, reject) => {
+    database.transaction((tx) => {
+      tx.executeSql(
+        `DELETE FROM categories WHERE id = ?;`,
+        [id],
+        (_, result) => {
+          resolve(result);
+        },
+        (_, err) => {
+          reject(err);
+          return true;
+        }
+      );
+    });
+  });
 }

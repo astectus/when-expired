@@ -1,6 +1,7 @@
 export interface NewProduct extends Omit<Product, 'id' | 'expirationDate'> {
   id?: string;
   expirationDate?: Date;
+  tempCategories?: string[];
 }
 export default class Product {
   public id: string;

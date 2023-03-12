@@ -6,7 +6,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import { isProduct } from '../utils/typeChecker';
 import DatePicker from '../components/ui/DatePicker';
 import AddImageContainer from '../components/ui/AddImageContainer';
-import Product from '../models/Product';
+import { NewProduct } from '../models/Product';
 import { ProductsContext } from '../state/context/products-context';
 import { getProductByBarcode } from '../api/api';
 
@@ -17,8 +17,8 @@ export default function AddProductScreen({
   navigation: NavigationProp<any>;
   route: any;
 }) {
-  const context = useContext(ProductsContext);
-  const [product, setProduct] = useState<Product | {}>({
+  const { addProduct } = useContext(ProductsContext);
+  const [product, setProduct] = useState<NewProduct | {}>({
     name: '',
     expirationDate: new Date(),
     price: '',
@@ -48,7 +48,7 @@ export default function AddProductScreen({
 
   const onSaveProduct = async () => {
     if (isProduct(product)) {
-      await context.addProduct(product);
+      await addProduct(product);
     }
     // redirect to home
     setProduct({});
@@ -119,13 +119,5 @@ const styles = StyleSheet.create({
   },
   spinnerTextStyle: {
     color: '#FFF',
-  },
-  backButtonContainer: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
-  },
-  backButton: {
-    marginLeft: -10,
   },
 });

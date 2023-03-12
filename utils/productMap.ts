@@ -12,5 +12,6 @@ export function productMap({ product }: BarCodeProduct): NewProduct {
     photoUri,
     price: online_stores[0]?.price,
     expirationDate: new Date(),
+    tempCategories: product.category || [],
   };
 }
