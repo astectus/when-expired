@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { NewProduct } from '../models/Product';
-import { productMap } from '../utils/productMap';
+import { productMapFromBarcode } from '../utils/productMapFromBarcode';
 
-export async function getProductByBarcode(barcode: string): Promise<NewProduct | null> {
+export async function getProductByBarcode(
+  barcode: string
+): Promise<{ product: NewProduct; categoryNames: string[] } | null> {
   const options = {
     method: 'GET',
     url: 'https://barcodes1.p.rapidapi.com/',
@@ -20,5 +22,5 @@ export async function getProductByBarcode(barcode: string): Promise<NewProduct |
     return null;
   }
 
-  return productMap(data);
+  return productMapFromBarcode(data);
 }

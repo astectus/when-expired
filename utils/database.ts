@@ -1,7 +1,8 @@
 import * as SQLite from 'expo-sqlite';
 import Product from '../models/Product';
 import { Category, NewCategory } from '../models/Category';
-import { isCategoryList } from './typeChecker';
+import { isCategory, isCategoryList } from './typeChecker';
+import { productMapFromDb } from './productMapFromBarcode';
 
 const database = SQLite.openDatabase('places.db');
 
@@ -89,20 +90,21 @@ export function fetchProductsDb(): Promise<Product[]> {
   return new Promise<Product[]>((resolve, reject) => {
     database.transaction((tx) => {
       tx.executeSql(
-        `SELECT * FROM products;`,
+        `SELECT 
+                       p.name,
+                       p.expirationDate,
+                       p.price,
+                       p.photoUri,
+                       p.description,
+                       p.id,
+                    GROUP_CONCAT(c.id,',') AS categoryIds,
+                    FROM products p
+                    INNER JOIN productCategories pc ON products.id = productCategories.productId
+                    INNER JOIN categories c ON productCategories.categoryId = categories.id
+        `,
         [],
         (_, result) => {
-          const products = result.rows._array.map(
-            (dp) =>
-              new Product({
-                id: dp.id.toString(),
-                name: dp.name,
-                expirationDate: new Date(dp.expirationDate),
-                price: dp.price,
-                photoUri: dp.photoUri,
-                description: dp.description,
-              })
-          );
+          const products = productMapFromDb(result.rows._array);
           resolve(products);
         },
         (_, err) => {
@@ -132,14 +134,40 @@ export function deleteProductDb(id: string) {
   });
 }
 
-export function insertCategoryDb({ name }: NewCategory) {
+export function insertCategoryDb({ name }: NewCategory): Promise<Category> {
   return new Promise((resolve, reject) => {
     database.transaction((tx) => {
       tx.executeSql(
         `INSERT INTO categories (name) VALUES (?);`,
         [name],
         (_, result) => {
-          resolve(result);
+          console.log(result);
+          const dbResult = result.rows._array[0];
+          if (isCategory(dbResult)) {
+            resolve(dbResult);
+          }
+        },
+        (_, err) => {
+          reject(err);
+          return true;
+        }
+      );
+    });
+  });
+}
+
+export function insertCategoriesDb(names: string[]): Promise<Category[]> {
+  return new Promise((resolve, reject) => {
+    database.transaction((tx) => {
+      tx.executeSql(
+        `INSERT INTO categories (name) VALUES ${names.map((n) => `(${n})`)};`,
+        [],
+        (_, result) => {
+          console.log(result);
+          const dbResult = result.rows._array;
+          if (isCategoryList(dbResult)) {
+            resolve(dbResult);
+          }
         },
         (_, err) => {
           reject(err);
@@ -179,6 +207,45 @@ export function deleteCategoryDb(id: string) {
         [id],
         (_, result) => {
           resolve(result);
+        },
+        (_, err) => {
+          reject(err);
+          return true;
+        }
+      );
+    });
+  });
+}
+
+export function updateCategoryDb({ id, name }: Category) {
+  return new Promise((resolve, reject) => {
+    database.transaction((tx) => {
+      tx.executeSql(
+        `UPDATE categories SET name = ? WHERE id = ?;`,
+        [name, id],
+        (_, result) => {
+          resolve(result);
+        },
+        (_, err) => {
+          reject(err);
+          return true;
+        }
+      );
+    });
+  });
+}
+
+export function fetchProductsByCategories(categories: Category[]): Promise<Product[]> {
+  return new Promise((resolve, reject) => {
+    database.transaction((tx) => {
+      tx.executeSql(
+        `SELECT * FROM products p
+                       INNER JOIN productCategories pc ON p.id = pc.productId
+                          WHERE pc.categoryId IN (${categories.map((c) => c.id).join(',')});`,
+        [],
+        (_, result) => {
+          const products = productMapFromDb(result.rows._array);
+          resolve(products);
         },
         (_, err) => {
           reject(err);

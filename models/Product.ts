@@ -1,7 +1,6 @@
 export interface NewProduct extends Omit<Product, 'id' | 'expirationDate'> {
   id?: string;
   expirationDate?: Date;
-  tempCategories?: string[];
 }
 export default class Product {
   public id: string;
@@ -18,6 +17,8 @@ export default class Product {
 
   public isFavorite?: boolean;
 
+  public categoryIds?: string[];
+
   constructor(data: NewProduct) {
     this.id = data.id || Math.random().toString();
     this.name = data.name;
@@ -25,5 +26,6 @@ export default class Product {
     this.price = data.price;
     this.photoUri = data.photoUri;
     this.description = data.description;
+    this.categoryIds = data.categoryIds || [];
   }
 }

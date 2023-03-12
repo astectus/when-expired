@@ -62,7 +62,7 @@ export default function AddImageContainer({
       quality: 1,
     });
 
-    if (!result.cancelled) {
+    if (!result.canceled) {
       setImage(result);
     }
   };

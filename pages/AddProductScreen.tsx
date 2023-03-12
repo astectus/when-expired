@@ -9,6 +9,7 @@ import AddImageContainer from '../components/ui/AddImageContainer';
 import { NewProduct } from '../models/Product';
 import { ProductsContext } from '../state/context/products-context';
 import { getProductByBarcode } from '../api/api';
+import CategorySelector from '../components/ui/CategorySelector';
 
 export default function AddProductScreen({
   navigation,
@@ -25,14 +26,16 @@ export default function AddProductScreen({
     photoUri: '',
     description: '',
   });
+  const [tempCategoriesNames, setTempCategoriesNames] = useState<string[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     async function getProduct(barcode: string) {
-      const product = await getProductByBarcode(barcode);
-      if (product) {
+      const data = await getProductByBarcode(barcode);
+      if (data?.product) {
         setProduct(product);
+        setTempCategoriesNames(data.categoryNames);
       } else {
         Alert.alert('Product not found', 'Please add product manually');
       }
@@ -48,11 +51,20 @@ export default function AddProductScreen({
 
   const onSaveProduct = async () => {
     if (isProduct(product)) {
-      await addProduct(product);
+      await addProduct(product, tempCategoriesNames);
     }
     // redirect to home
-    setProduct({});
     navigation.navigate('Home');
+  };
+
+  const onAddCategory = (categoryName: string) => {
+    setTempCategoriesNames((prevState) => [...prevState, categoryName]);
+  };
+
+  const onDeleteCategory = (categoryName: string) => {
+    setTempCategoriesNames((prevState) =>
+      prevState.filter((category) => category !== categoryName)
+    );
   };
 
   // @ts-ignore
@@ -83,6 +95,11 @@ export default function AddProductScreen({
             onChangeText={(description) => setProduct({ ...product, description })}
           />
           <DatePicker defaultDate={product.expirationDate} />
+          <CategorySelector
+            categories={tempCategoriesNames}
+            onAddCategory={onAddCategory}
+            onDeleteCategory={onDeleteCategory}
+          />
           <View style={styles.imageContainer}>
             <AddImageContainer
               defaultImageUri={product.photoUri}

@@ -7,7 +7,10 @@ import {
   deleteProductDb,
   fetchCategoriesDb,
   fetchProductsDb,
+  insertCategoriesDb,
+  insertCategoryDb,
   insertProductDb,
+  updateCategoryDb,
   updateProductDb,
 } from '../../utils/database';
 import { isCategory, isProduct } from '../../utils/typeChecker';
@@ -16,21 +19,25 @@ import { Category, NewCategory } from '../../models/Category';
 interface IProductContext {
   products: Product[];
   categories: Category[];
-  addProduct: (product: NewProduct) => Promise<void>;
+  addProduct: (product: NewProduct, categoryNames: string[]) => Promise<void>;
   removeProduct: (id: string) => Promise<void>;
   updateProduct: (product: Product) => Promise<void>;
-  addCategory: (category: Category) => Promise<void>;
+  addCategory: (category: Category) => Promise<Category | undefined>;
+  addCategories: (categories: string[]) => Promise<Category[] | undefined>;
   removeCategory: (id: string) => Promise<void>;
+  updateCategory: (category: Category) => Promise<void>;
 }
 
 export const ProductsContext = createContext<IProductContext>({
   products: [],
   categories: [],
-  addProduct: async (product: NewProduct) => {},
-  removeProduct: async (id: string) => {},
-  updateProduct: async (product: Product) => {},
-  addCategory: async (category: NewCategory) => {},
-  removeCategory: async (id: string) => {},
+  addProduct: async (product: NewProduct, categoryNames: string[]) => undefined,
+  removeProduct: async (id: string) => undefined,
+  updateProduct: async (product: Product) => undefined,
+  addCategory: async (category: NewCategory) => undefined,
+  addCategories: async (categoryName: string[]) => undefined,
+  removeCategory: async (id: string) => undefined,
+  updateCategory: async (category: Category) => undefined,
 });
 
 function ProductsContextProvider({ children }: { children: ReactElement }) {
@@ -48,14 +55,6 @@ function ProductsContextProvider({ children }: { children: ReactElement }) {
     fetch();
   }, []);
 
-  async function addProduct(product: NewProduct) {
-    if (isProduct(product)) {
-      await insertProductDb(product);
-      const products = await fetchProductsDb();
-      setProducts(products);
-    }
-  }
-
   async function removeProduct(id: string) {
     await deleteProductDb(id);
     const products = await fetchProductsDb();
@@ -70,29 +69,60 @@ function ProductsContextProvider({ children }: { children: ReactElement }) {
 
   async function addCategory(category: NewCategory) {
     if (isCategory(category)) {
-      await isCategory(category);
-      const categories = await fetchCategoriesDb();
-      setCategories(categories);
+      const newCategory = await insertCategoryDb(category);
+      setCategories([...categories, newCategory]);
+      return newCategory;
     }
+    return undefined;
+  }
+
+  async function addCategories(categoryNames: string[]) {
+    const newCategories = await insertCategoriesDb(categoryNames);
+    setCategories([...categories, ...newCategories]);
+    return newCategories;
   }
 
   async function removeCategory(id: string) {
     await deleteCategoryDb(id);
     const categories = await fetchCategoriesDb();
+    const products = await fetchProductsDb();
+    setCategories(categories);
+    setProducts(products);
+  }
+
+  async function updateCategory(category: Category) {
+    await updateCategoryDb(category);
+    const categories = await fetchCategoriesDb();
     setCategories(categories);
   }
 
-  const value = useMemo(() => {
-    return {
+  async function addProduct(product: NewProduct, categoryNames: string[]) {
+    if (isProduct(product)) {
+      if (categoryNames.length > 0) {
+        const newCategories = await addCategories(categoryNames);
+        // TODO: add many to many for product to category
+        product.categoryIds = newCategories.map((category) => category.id);
+      }
+      await insertProductDb(product);
+      const products = await fetchProductsDb();
+      setProducts(products);
+    }
+  }
+
+  const value = useMemo(
+    () => ({
       products,
-      categories,
-      addCategory,
-      removeCategory,
       addProduct,
       removeProduct,
       updateProduct,
-    };
-  }, [products, categories]);
+      categories,
+      addCategory,
+      addCategories,
+      updateCategory,
+      removeCategory,
+    }),
+    [products, categories]
+  );
 
   return <ProductsContext.Provider value={value}>{children}</ProductsContext.Provider>;
 }

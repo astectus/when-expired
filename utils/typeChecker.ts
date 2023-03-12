@@ -42,7 +42,7 @@ export function isCategoryList(array: Array<unknown>): array is Category[] {
   return false;
 }
 
-export function isCategory(object: unknown): object is Image {
+export function isCategory(object: unknown): object is Category {
   if (object !== null && typeof object === 'object') {
     // @ts-ignore
     return 'name' in object;
