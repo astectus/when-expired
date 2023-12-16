@@ -13,7 +13,19 @@ export const init = () =>
         `CREATE TABLE IF NOT EXISTS categories (
                          id INTEGER PRIMARY KEY NOT NULL, 
                          name TEXT NOT NULL
-                         );                      
+                         );`,
+        [],
+        (_) => {
+          resolve(true);
+        },
+        (_, err) => {
+          console.log(err);
+          reject(err);
+          return true;
+        }
+      );
+      tx.executeSql(
+        `                
                      CREATE TABLE IF NOT EXISTS products (
                          id INTEGER PRIMARY KEY NOT NULL, 
                          name TEXT NOT NULL, 
@@ -21,8 +33,23 @@ export const init = () =>
                          price TEXT, 
                          photoUri TEXT, 
                          description TEXT
-                         );   
+                         );`,
+        [],
+        (_) => {
+          resolve(true);
+        },
+        (_, err) => {
+          reject(err);
+          console.log(err);
+          return true;
+        }
+      );
+      tx.executeSql(
+        `
                      CREATE TABLE IF NOT EXISTS productCategories (
+                       id INTEGER PRIMARY KEY NOT NULL, 
+                       productId INTEGER NOT NULL, 
+                       categoryId INTEGER NOT NULL,
                           CONSTRAINT fk_product
                                FOREIGN KEY (productId)
                                REFERENCES products(id)
@@ -34,9 +61,12 @@ export const init = () =>
                                );                                 
                          `,
         [],
-        () => resolve(true),
+        (_) => {
+          resolve(true);
+        },
         (_, err) => {
           reject(err);
+          console.log(err);
           return true;
         }
       );
