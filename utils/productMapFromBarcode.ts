@@ -24,13 +24,13 @@ export function productMapFromDb(dbProducts: any[]): Product[] {
   return dbProducts.map(
     (dp) =>
       new Product({
-        id: dp.id.toString(),
+        id: dp.id?.toString(),
         name: dp.name,
         expirationDate: new Date(dp.expirationDate),
         price: dp.price,
         photoUri: dp.photoUri,
         description: dp.description,
-        categoryIds: dp.categoryIds.split(','),
+        categoryIds: dp.categoryIds?.split(','),
       })
   );
 }

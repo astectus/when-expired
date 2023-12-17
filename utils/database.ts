@@ -121,17 +121,15 @@ export function fetchProductsDb(): Promise<Product[]> {
     database.transaction((tx) => {
       tx.executeSql(
         `SELECT 
-                       p.name,
-                       p.expirationDate,
-                       p.price,
-                       p.photoUri,
-                       p.description,
-                       p.id,
-                    GROUP_CONCAT(c.id,',') AS categoryIds,
-                    FROM products p
-                    INNER JOIN productCategories pc ON products.id = productCategories.productId
-                    INNER JOIN categories c ON productCategories.categoryId = categories.id
-        `,
+                       products.name,
+                       products.expirationDate,
+                       products.price,
+                       products.photoUri,
+                       products.description,
+                       products.id,
+                    GROUP_CONCAT(productCategories.categoryId,',') AS categoryIds
+                    FROM products
+                    LEFT JOIN productCategories ON products.id = productCategories.productId;`,
         [],
         (_, result) => {
           const products = productMapFromDb(result.rows._array);
