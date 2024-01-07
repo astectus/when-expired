@@ -48,6 +48,8 @@ function ProductsContextProvider({ children }: { children: ReactElement }) {
     async function fetch() {
       const products = await fetchProductsDb();
       const categories = await fetchCategoriesDb();
+      console.log(products);
+      console.log(categories);
       setProducts(products);
       setCategories(categories);
     }

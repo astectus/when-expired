@@ -16,7 +16,7 @@ export default function CategorySelector({
         {categories &&
           categories.length > 0 &&
           categories.map((category) => (
-            <Chip icon="information" onClose={() => onDeleteCategory(category)}>
+            <Chip icon="information" key={category} onClose={() => onDeleteCategory(category)}>
               {category}
             </Chip>
           ))}

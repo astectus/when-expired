@@ -27,7 +27,7 @@
     "expo-splash-screen": "~0.20.5",
     "expo-sqlite": "~11.3.3",
     "expo-status-bar": "~1.6.0",
-    "expo-updates": "~0.18.18",
+    "expo-updates": "~0.18.19",
     "g": "^2.0.1",
     "intl": "^1.2.5",
     "react": "18.2.0",
@@ -42,7 +42,8 @@
     "react-native-step-indicator": "^1.0.3",
     "react-native-vector-icons": "^9.2.0",
     "react-native-web": "~0.19.6",
-    "react-query": "^3.39.3"
+    "react-query": "^3.39.3",
+    "@expo/webpack-config": "^19.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

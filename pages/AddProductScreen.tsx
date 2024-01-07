@@ -31,16 +31,16 @@ export default function AddProductScreen({
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    async function getProduct(barcode: string) {
+    const getProduct = async (barcode: string) => {
       const data = await getProductByBarcode(barcode);
       if (data?.product) {
-        setProduct(product);
+        setProduct(data?.product);
         setTempCategoriesNames(data.categoryNames);
       } else {
         Alert.alert('Product not found', 'Please add product manually');
       }
       setIsLoading(false);
-    }
+    };
     if (route?.params?.barcode) {
       setIsLoading(true);
       getProduct(route?.params.barcode);
