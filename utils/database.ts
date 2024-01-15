@@ -12,7 +12,8 @@ export const init = () =>
       tx.executeSql(
         `CREATE TABLE IF NOT EXISTS categories (
                          id INTEGER PRIMARY KEY NOT NULL, 
-                         name TEXT NOT NULL
+                         name TEXT NOT NULL,
+                         trimName TEXT NOT NULL,
                          );`,
         [],
         (_) => {
@@ -162,12 +163,12 @@ export function deleteProductDb(id: string) {
   });
 }
 
-export function insertCategoryDb({ name }: NewCategory): Promise<Category> {
+export function insertCategoryDb({ name, trimName }: NewCategory): Promise<Category> {
   return new Promise((resolve, reject) => {
     database.transaction((tx) => {
       tx.executeSql(
-        `INSERT INTO categories (name) VALUES (?);`,
-        [name],
+        `INSERT INTO categories (name, trimName) VALUES (?, ?);`,
+        [name, trimName],
         (_, result) => {
           console.log(result);
           const dbResult = result.rows._array[0];
@@ -184,11 +185,30 @@ export function insertCategoryDb({ name }: NewCategory): Promise<Category> {
   });
 }
 
-export function insertCategoriesDb(names: string[]): Promise<Category[]> {
+export function insertProductCategories(productId: string, categoryId: string): Promise<void> {
   return new Promise((resolve, reject) => {
     database.transaction((tx) => {
       tx.executeSql(
-        `INSERT INTO categories (name) VALUES ${names.map((n) => `(${n})`)};`,
+        `INSERT INTO productCategories (productId, categoryId) VALUES (?, ?);`,
+        [productId, categoryId],
+        (_, result) => {
+          console.log(result);
+          resolve();
+        },
+        (_, err) => {
+          reject(err);
+          return true;
+        }
+      );
+    });
+  });
+}
+
+export function insertCategoriesDb(newCategory: NewCategory[]): Promise<Category[]> {
+  return new Promise((resolve, reject) => {
+    database.transaction((tx) => {
+      tx.executeSql(
+        `INSERT INTO categories (name, trimName) VALUES ${newCategory.map(({ name, trimName }) => `(${name}, ${trimName})`)};`,
         [],
         (_, result) => {
           console.log(result);
@@ -245,12 +265,12 @@ export function deleteCategoryDb(id: string) {
   });
 }
 
-export function updateCategoryDb({ id, name }: Category) {
+export function updateCategoryDb({ id, name, trimName }: Category) {
   return new Promise((resolve, reject) => {
     database.transaction((tx) => {
       tx.executeSql(
-        `UPDATE categories SET name = ? WHERE id = ?;`,
-        [name, id],
+        `UPDATE categories SET name = ?, trimName = ? WHERE id = ?;`,
+        [name, trimName, id],
         (_, result) => {
           resolve(result);
         },

@@ -79,7 +79,19 @@ function ProductsContextProvider({ children }: { children: ReactElement }) {
   }
 
   async function addCategories(categoryNames: string[]) {
-    const newCategories = await insertCategoriesDb(categoryNames);
+    const categoriesToAdd: NewCategory[] = [];
+    categoryNames.forEach((categoryName) => {
+      const rawCategory = categoryName.trim().toLowerCase();
+      const foundCategory = categories.find((category) => category.trimName !== rawCategory);
+      if (!foundCategory) {
+        categoriesToAdd.push({ name: categoryName, trimName: rawCategory });
+      }
+    });
+
+    if (!categoriesToAdd.length) {
+      return [];
+    }
+    const newCategories = await insertCategoriesDb(categoriesToAdd);
     setCategories([...categories, ...newCategories]);
     return newCategories;
   }
@@ -98,8 +110,9 @@ function ProductsContextProvider({ children }: { children: ReactElement }) {
     setCategories(categories);
   }
 
-  async function addProduct(product: NewProduct, categoryNames: string[]) {
+  async function addProduct(product: NewProduct, categories: Array<NewCategory | Category>) {
     if (isProduct(product)) {
+      let categories: Category[] = [];
       if (categoryNames.length > 0) {
         const newCategories = await addCategories(categoryNames);
         // TODO: add many to many for product to category

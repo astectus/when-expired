@@ -10,6 +10,7 @@ import { NewProduct } from '../models/Product';
 import { ProductsContext } from '../state/context/products-context';
 import { getProductByBarcode } from '../api/api';
 import CategorySelector from '../components/ui/CategorySelector';
+import { Category, NewCategory } from '../models/Category';
 
 export default function AddProductScreen({
   navigation,
@@ -18,7 +19,7 @@ export default function AddProductScreen({
   navigation: NavigationProp<any>;
   route: any;
 }) {
-  const { addProduct } = useContext(ProductsContext);
+  const { addProduct, addCategories } = useContext(ProductsContext);
   const [product, setProduct] = useState<NewProduct | {}>({
     name: '',
     expirationDate: new Date(),
@@ -26,7 +27,7 @@ export default function AddProductScreen({
     photoUri: '',
     description: '',
   });
-  const [tempCategoriesNames, setTempCategoriesNames] = useState<string[]>([]);
+  const [tempCategoriesNames, setTempCategoriesNames] = useState<Array<NewCategory | Category>>([]);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -57,13 +58,13 @@ export default function AddProductScreen({
     navigation.navigate('Home');
   };
 
-  const onAddCategory = (categoryName: string) => {
-    setTempCategoriesNames((prevState) => [...prevState, categoryName]);
+  const onAddCategory = (category: NewCategory | Category) => {
+    setTempCategoriesNames((prevState) => [...prevState, category]);
   };
 
-  const onDeleteCategory = (categoryName: string) => {
+  const onDeleteCategory = (newCategory: NewCategory | Category) => {
     setTempCategoriesNames((prevState) =>
-      prevState.filter((category) => category !== categoryName)
+      prevState.filter((category) => category.trimName !== newCategory.trimName)
     );
   };
 

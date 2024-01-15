@@ -4,4 +4,5 @@ export interface NewCategory extends Omit<Category, 'id'> {
 export interface Category {
   id: string;
   name: string;
+  trimName: string;
 }

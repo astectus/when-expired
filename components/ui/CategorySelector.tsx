@@ -1,14 +1,15 @@
 import { Chip, TextInput } from 'react-native-paper';
 import { View } from 'react-native';
+import { Category, NewCategory } from '../../models/Category';
 
 export default function CategorySelector({
   categories,
   onAddCategory,
   onDeleteCategory,
 }: {
-  categories: string[];
-  onAddCategory: (categoryName: string) => void;
-  onDeleteCategory: (categoryName: string) => void;
+  categories: NewCategory[];
+  onAddCategory: (category: NewCategory) => void;
+  onDeleteCategory: (category: NewCategory | Category) => void;
 }) {
   return (
     <View>
@@ -16,15 +17,21 @@ export default function CategorySelector({
         {categories &&
           categories.length > 0 &&
           categories.map((category) => (
-            <Chip icon="information" key={category} onClose={() => onDeleteCategory(category)}>
-              {category}
+            <Chip
+              icon="information"
+              key={category.trimName}
+              onClose={() => onDeleteCategory(category)}
+            >
+              {category.name}
             </Chip>
           ))}
       </View>
       <TextInput
         mode="outlined"
         placeholder="Add Category"
-        onChangeText={onAddCategory}
+        onChangeText={(category) =>
+          onAddCategory({ name: category, trimName: category.trim().toLowerCase() })
+        }
         right={<TextInput.Icon icon="plus" />}
       />
     </View>
