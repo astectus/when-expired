@@ -185,12 +185,14 @@ export function insertCategoryDb({ name, trimName }: NewCategory): Promise<Categ
   });
 }
 
-export function insertProductCategories(productId: string, categoryId: string): Promise<void> {
+export function insertProductCategories(productId: string, categories: Category[]): Promise<void> {
   return new Promise((resolve, reject) => {
     database.transaction((tx) => {
       tx.executeSql(
-        `INSERT INTO productCategories (productId, categoryId) VALUES (?, ?);`,
-        [productId, categoryId],
+        `INSERT INTO productCategories (productId, categoryId) VALUES ${categories.map(
+          ({ id }) => `(${productId}, ${id})`
+        )};`,
+        [],
         (_, result) => {
           console.log(result);
           resolve();
@@ -208,7 +210,9 @@ export function insertCategoriesDb(newCategory: NewCategory[]): Promise<Category
   return new Promise((resolve, reject) => {
     database.transaction((tx) => {
       tx.executeSql(
-        `INSERT INTO categories (name, trimName) VALUES ${newCategory.map(({ name, trimName }) => `(${name}, ${trimName})`)};`,
+        `INSERT INTO categories (name, trimName) VALUES ${newCategory.map(
+          ({ name, trimName }) => `(${name}, ${trimName})`
+        )};`,
         [],
         (_, result) => {
           console.log(result);

@@ -19,11 +19,11 @@ import { Category, NewCategory } from '../../models/Category';
 interface IProductContext {
   products: Product[];
   categories: Category[];
-  addProduct: (product: NewProduct, categoryNames: string[]) => Promise<void>;
+  addProduct: (product: NewProduct, categoryNames: NewCategory[]) => Promise<void>;
   removeProduct: (id: string) => Promise<void>;
   updateProduct: (product: Product) => Promise<void>;
-  addCategory: (category: Category) => Promise<Category | undefined>;
-  addCategories: (categories: string[]) => Promise<Category[] | undefined>;
+  addCategory: (category: NewCategory) => Promise<Category | undefined>;
+  addCategories: (categories: NewCategory[]) => Promise<Category[] | undefined>;
   removeCategory: (id: string) => Promise<void>;
   updateCategory: (category: Category) => Promise<void>;
 }
@@ -31,11 +31,11 @@ interface IProductContext {
 export const ProductsContext = createContext<IProductContext>({
   products: [],
   categories: [],
-  addProduct: async (product: NewProduct, categoryNames: string[]) => undefined,
+  addProduct: async (product: NewProduct, categoryNames: NewCategory[]) => undefined,
   removeProduct: async (id: string) => undefined,
   updateProduct: async (product: Product) => undefined,
   addCategory: async (category: NewCategory) => undefined,
-  addCategories: async (categoryName: string[]) => undefined,
+  addCategories: async (categoryName: NewCategory[]) => undefined,
   removeCategory: async (id: string) => undefined,
   updateCategory: async (category: Category) => undefined,
 });
@@ -78,22 +78,23 @@ function ProductsContextProvider({ children }: { children: ReactElement }) {
     return undefined;
   }
 
-  async function addCategories(categoryNames: string[]) {
+  async function addCategories(newCategories: NewCategory[]) {
     const categoriesToAdd: NewCategory[] = [];
-    categoryNames.forEach((categoryName) => {
-      const rawCategory = categoryName.trim().toLowerCase();
-      const foundCategory = categories.find((category) => category.trimName !== rawCategory);
+    newCategories.forEach((newCategory) => {
+      const foundCategory = categories.find(
+        (category) => category.trimName === newCategory.trimName
+      );
       if (!foundCategory) {
-        categoriesToAdd.push({ name: categoryName, trimName: rawCategory });
+        categoriesToAdd.push(newCategory);
       }
     });
 
     if (!categoriesToAdd.length) {
       return [];
     }
-    const newCategories = await insertCategoriesDb(categoriesToAdd);
-    setCategories([...categories, ...newCategories]);
-    return newCategories;
+    const addedCategories = await insertCategoriesDb(categoriesToAdd);
+    setCategories([...categories, ...addedCategories]);
+    return addedCategories;
   }
 
   async function removeCategory(id: string) {
@@ -112,13 +113,15 @@ function ProductsContextProvider({ children }: { children: ReactElement }) {
 
   async function addProduct(product: NewProduct, categories: Array<NewCategory | Category>) {
     if (isProduct(product)) {
-      let categories: Category[] = [];
-      if (categoryNames.length > 0) {
-        const newCategories = await addCategories(categoryNames);
+      let productCategories: Category[] = [];
+      if (categories.length > 0) {
+        productCategories = await addCategories(categories);
         // TODO: add many to many for product to category
-        product.categoryIds = newCategories.map((category) => category.id);
       }
-      await insertProductDb(product);
+      const addedProduct = await insertProductDb(product);
+
+      if (productCategories.length > 0) {
+      }
       const products = await fetchProductsDb();
       setProducts(products);
     }
