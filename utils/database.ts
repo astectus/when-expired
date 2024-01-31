@@ -9,11 +9,12 @@ const database = SQLite.openDatabase('places.db');
 export const init = () =>
   new Promise((resolve, reject) => {
     database.transaction((tx) => {
+      tx.executeSql(`DROP TABLE IF EXISTS categories;`);
       tx.executeSql(
         `CREATE TABLE IF NOT EXISTS categories (
                          id INTEGER PRIMARY KEY NOT NULL, 
                          name TEXT NOT NULL,
-                         trimName TEXT NOT NULL,
+                         trimName TEXT NOT NULL
                          );`,
         [],
         (_) => {
@@ -25,6 +26,7 @@ export const init = () =>
           return true;
         }
       );
+      tx.executeSql(`DROP TABLE IF EXISTS products;`);
       tx.executeSql(
         `                
                      CREATE TABLE IF NOT EXISTS products (
@@ -45,6 +47,7 @@ export const init = () =>
           return true;
         }
       );
+      tx.executeSql(`DROP TABLE IF EXISTS productCategories;`);
       tx.executeSql(
         `
                      CREATE TABLE IF NOT EXISTS productCategories (
@@ -152,6 +155,7 @@ export function deleteProductDb(id: string) {
         `DELETE FROM products WHERE id = ?;`,
         [id],
         (_, result) => {
+          j;
           resolve(result);
         },
         (_, err) => {
