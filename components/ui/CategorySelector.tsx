@@ -16,10 +16,10 @@ export default function CategorySelector({
       <View>
         {categories &&
           categories.length > 0 &&
-          categories.map((category) => (
+          categories.map((category, index) => (
             <Chip
               icon="information"
-              key={category.trimName}
+              key={`${category.trimName}${index}`}
               onClose={() => onDeleteCategory(category)}
             >
               {category.name}

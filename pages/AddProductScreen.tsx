@@ -36,7 +36,7 @@ export default function AddProductScreen({
       const data = await getProductByBarcode(barcode);
       if (data?.product) {
         setProduct(data?.product);
-        setTempCategoriesNames(data.categoryNames);
+        setTempCategoriesNames(data.categories);
       } else {
         Alert.alert('Product not found', 'Please add product manually');
       }

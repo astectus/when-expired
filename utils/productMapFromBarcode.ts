@@ -1,13 +1,21 @@
 import { BarCodeProduct } from '../models/BarCodeProduct';
 import Product, { NewProduct } from '../models/Product';
+import { NewCategory } from '../models/Category';
+import { tr } from 'react-native-paper-dates';
 
 export function productMapFromBarcode({ product }: BarCodeProduct): {
   product: NewProduct;
-  categoryNames: string[];
+  categories: NewCategory[];
 } {
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { title, description, images, online_stores } = product;
+  const { title, description, images, online_stores, category } = product;
   const [photoUri] = images;
+  const categories: NewCategory[] | undefined = category?.map((c) => {
+    return {
+      name: c,
+      trimName: c.toLowerCase().trim(),
+    };
+  });
 
   return {
     product: {
@@ -17,7 +25,7 @@ export function productMapFromBarcode({ product }: BarCodeProduct): {
       price: online_stores[0]?.price,
       expirationDate: new Date(),
     },
-    categoryNames: product.category || [],
+    categories,
   };
 }
 export function productMapFromDb(dbProducts: any[]): Product[] {

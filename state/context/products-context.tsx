@@ -93,6 +93,7 @@ function ProductsContextProvider({ children }: { children: ReactElement }) {
       return [];
     }
     const addedCategories = await insertCategoriesDb(categoriesToAdd);
+    console.log(addedCategories);
     setCategories([...categories, ...addedCategories]);
     return addedCategories;
   }

@@ -215,7 +215,7 @@ export function insertCategoriesDb(newCategory: NewCategory[]): Promise<Category
     database.transaction((tx) => {
       tx.executeSql(
         `INSERT INTO categories (name, trimName) VALUES ${newCategory.map(
-          ({ name, trimName }) => `(${name}, ${trimName})`
+          ({ name, trimName }) => `("${name}", "${trimName}")`
         )};`,
         [],
         (_, result) => {
