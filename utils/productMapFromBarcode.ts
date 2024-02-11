@@ -13,7 +13,7 @@ export function productMapFromBarcode({ product }: BarCodeProduct): {
   const categories: NewCategory[] | undefined = category?.map((c) => {
     return {
       name: c,
-      trimName: c.toLowerCase().trim(),
+      trimName: c.toLowerCase().replace(/\s/g, ''),
     };
   });
 

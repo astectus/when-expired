@@ -25,7 +25,7 @@
     "expo-image-picker": "~14.3.2",
     "expo-localization": "~14.3.0",
     "expo-splash-screen": "~0.20.5",
-    "expo-sqlite": "~11.3.3",
+    "expo-sqlite": "~13.2.2",
     "expo-status-bar": "~1.6.0",
     "expo-updates": "~0.18.19",
     "g": "^2.0.1",

@@ -9,6 +9,7 @@ import {
   fetchProductsDb,
   insertCategoriesDb,
   insertCategoryDb,
+  insertProductCategoriesV2,
   insertProductDb,
   updateCategoryDb,
   updateProductDb,
@@ -92,7 +93,7 @@ function ProductsContextProvider({ children }: { children: ReactElement }) {
     if (!categoriesToAdd.length) {
       return [];
     }
-    const addedCategories = await insertCategoriesDb(categoriesToAdd);
+    const addedCategories = await insertProductCategoriesV2(categoriesToAdd);
     console.log(addedCategories);
     setCategories([...categories, ...addedCategories]);
     return addedCategories;

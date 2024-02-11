@@ -9,7 +9,6 @@ const database = SQLite.openDatabase('places.db');
 export const init = () =>
   new Promise((resolve, reject) => {
     database.transaction((tx) => {
-      tx.executeSql(`DROP TABLE IF EXISTS categories;`);
       tx.executeSql(
         `CREATE TABLE IF NOT EXISTS categories (
                          id INTEGER PRIMARY KEY NOT NULL, 
@@ -26,9 +25,8 @@ export const init = () =>
           return true;
         }
       );
-      tx.executeSql(`DROP TABLE IF EXISTS products;`);
       tx.executeSql(
-        `                
+        `
                      CREATE TABLE IF NOT EXISTS products (
                          id INTEGER PRIMARY KEY NOT NULL, 
                          name TEXT NOT NULL, 
@@ -47,7 +45,6 @@ export const init = () =>
           return true;
         }
       );
-      tx.executeSql(`DROP TABLE IF EXISTS productCategories;`);
       tx.executeSql(
         `
                      CREATE TABLE IF NOT EXISTS productCategories (
@@ -155,7 +152,6 @@ export function deleteProductDb(id: string) {
         `DELETE FROM products WHERE id = ?;`,
         [id],
         (_, result) => {
-          j;
           resolve(result);
         },
         (_, err) => {
@@ -175,7 +171,7 @@ export function insertCategoryDb({ name, trimName }: NewCategory): Promise<Categ
         [name, trimName],
         (_, result) => {
           console.log(result);
-          const dbResult = result.rows._array[0];
+          const dbResult = result.insertId;
           if (isCategory(dbResult)) {
             resolve(dbResult);
           }
@@ -210,6 +206,11 @@ export function insertProductCategories(productId: string, categories: Category[
   });
 }
 
+export function insertProductCategoriesV2(newCategory: NewCategory[]): Promise<Category[]> {
+  const promises = newCategory.map((category) => insertCategoryDb(category));
+  return Promise.all(promises);
+}
+
 export function insertCategoriesDb(newCategory: NewCategory[]): Promise<Category[]> {
   return new Promise((resolve, reject) => {
     database.transaction((tx) => {
@@ -219,7 +220,7 @@ export function insertCategoriesDb(newCategory: NewCategory[]): Promise<Category
         )};`,
         [],
         (_, result) => {
-          console.log(result);
+          console.log('db insert', result);
           const dbResult = result.rows._array;
           if (isCategoryList(dbResult)) {
             resolve(dbResult);
