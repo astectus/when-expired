@@ -9,6 +9,7 @@ import {
   fetchProductsDb,
   insertCategoriesDb,
   insertCategoryDb,
+  insertProductCategories,
   insertProductCategoriesV2,
   insertProductDb,
   updateCategoryDb,
@@ -81,22 +82,26 @@ function ProductsContextProvider({ children }: { children: ReactElement }) {
 
   async function addCategories(newCategories: NewCategory[]) {
     const categoriesToAdd: NewCategory[] = [];
+    const existingCategories: Category[] = [];
     newCategories.forEach((newCategory) => {
       const foundCategory = categories.find(
         (category) => category.trimName === newCategory.trimName
       );
       if (!foundCategory) {
         categoriesToAdd.push(newCategory);
+      } else {
+        existingCategories.push(foundCategory);
       }
     });
 
     if (!categoriesToAdd.length) {
       return [];
     }
-    const addedCategories = await insertProductCategoriesV2(categoriesToAdd);
+    const addedCategories = await insertCategoriesDb(categoriesToAdd);
     console.log(addedCategories);
+    console.log(existingCategories);
     setCategories([...categories, ...addedCategories]);
-    return addedCategories;
+    return [...addedCategories, ...existingCategories];
   }
 
   async function removeCategory(id: string) {
@@ -118,11 +123,11 @@ function ProductsContextProvider({ children }: { children: ReactElement }) {
       let productCategories: Category[] = [];
       if (categories.length > 0) {
         productCategories = await addCategories(categories);
-        // TODO: add many to many for product to category
       }
       const addedProduct = await insertProductDb(product);
 
       if (productCategories.length > 0) {
+        await insertProductCategories(addedProduct.id, productCategories);
       }
       const products = await fetchProductsDb();
       setProducts(products);

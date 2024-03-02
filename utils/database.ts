@@ -1,14 +1,28 @@
 import * as SQLite from 'expo-sqlite';
 import Product from '../models/Product';
 import { Category, NewCategory } from '../models/Category';
-import { isCategory, isCategoryList } from './typeChecker';
+import {
+  isCategory,
+  isCategoryList,
+  isProduct,
+  isResultSet,
+  isResultSetArray,
+} from './typeChecker';
 import { productMapFromDb } from './productMapFromBarcode';
+import { ResultSet } from 'expo-sqlite';
+import { log } from 'expo-updates/build-cli/utils/log';
 
 const database = SQLite.openDatabase('places.db');
 
 export const init = () =>
   new Promise((resolve, reject) => {
     database.transaction((tx) => {
+      const nop = () => {};
+      const onError = (_: any, error: any) => {
+        reject(error);
+        return false;
+      };
+      tx.executeSql('DROP TABLE IF EXISTS categories;', [], nop, onError);
       tx.executeSql(
         `CREATE TABLE IF NOT EXISTS categories (
                          id INTEGER PRIMARY KEY NOT NULL, 
@@ -25,6 +39,7 @@ export const init = () =>
           return true;
         }
       );
+      tx.executeSql('DROP TABLE IF EXISTS products;', [], nop, onError);
       tx.executeSql(
         `
                      CREATE TABLE IF NOT EXISTS products (
@@ -45,6 +60,7 @@ export const init = () =>
           return true;
         }
       );
+      tx.executeSql('DROP TABLE IF EXISTS productCategories;', [], nop, onError);
       tx.executeSql(
         `
                      CREATE TABLE IF NOT EXISTS productCategories (
@@ -74,21 +90,39 @@ export const init = () =>
     });
   });
 
-export function insertProductDb({ name, expirationDate, price, photoUri, description }: Product) {
+export function insertProductDb({
+  name,
+  expirationDate,
+  price,
+  photoUri,
+  description,
+}: Product): Promise<Product> {
   return new Promise((resolve, reject) => {
-    database.transaction((tx) => {
-      tx.executeSql(
-        `INSERT INTO products (name, expirationDate, price, photoUri, description) VALUES (?, ?, ?, ?, ?);`,
-        [name, expirationDate.toISOString(), price || '', photoUri || '', description || ''],
-        (_, result) => {
-          resolve(result);
+    database.execRawQuery(
+      [
+        {
+          // Unsupprted on Android using the `exec` function
+          sql: 'INSERT INTO products (name, expirationDate, price, photoUri, description) VALUES (?, ?, ?, ?, ?) RETURNING *',
+          args: [
+            name,
+            expirationDate.toISOString(),
+            price || '',
+            photoUri || '',
+            description || '',
+          ],
         },
-        (_, err) => {
-          reject(err);
+      ],
+      false,
+      (error, resultSet) => {
+        if (error) {
+          reject(error);
           return true;
+        } else if (isResultSetArray(resultSet) && isProduct(resultSet[0].rows[0])) {
+          console.log(resultSet[0].rows[0]);
+          resolve(resultSet[0].rows[0]);
         }
-      );
-    });
+      }
+    );
   });
 }
 
@@ -101,19 +135,32 @@ export function updateProductDb({
   description,
 }: Product) {
   return new Promise((resolve, reject) => {
-    database.transaction((tx) => {
-      tx.executeSql(
-        `UPDATE products SET name = ?, expirationDate = ?, price = ?, photoUri = ?, description = ? WHERE id = ?;`,
-        [name, expirationDate.toISOString(), price || '', photoUri || '', description || '', id],
-        (_, result) => {
-          resolve(result);
+    database.execRawQuery(
+      [
+        {
+          // Unsupprted on Android using the `exec` function
+          sql: 'UPDATE products SET name = ?, expirationDate = ?, price = ?, photoUri = ?, description = ? WHERE id = ? RETURNING *',
+          args: [
+            name,
+            expirationDate.toISOString(),
+            price || '',
+            photoUri || '',
+            description || '',
+            id,
+          ],
         },
-        (_, err) => {
-          reject(err);
+      ],
+      false,
+      (error, resultSet) => {
+        if (error) {
+          reject(error);
           return true;
+        } else if (isResultSetArray(resultSet)) {
+          console.log(resultSet[0].rows[0]);
+          resolve(resultSet[0].rows[0]);
         }
-      );
-    });
+      }
+    );
   });
 }
 
@@ -147,62 +194,78 @@ export function fetchProductsDb(): Promise<Product[]> {
 
 export function deleteProductDb(id: string) {
   return new Promise((resolve, reject) => {
-    database.transaction((tx) => {
-      tx.executeSql(
-        `DELETE FROM products WHERE id = ?;`,
-        [id],
-        (_, result) => {
-          resolve(result);
+    database.execRawQuery(
+      [
+        {
+          // Unsupprted on Android using the `exec` function
+          sql: 'DELETE FROM products WHERE id = ? RETURNING *',
+          args: [id],
         },
-        (_, err) => {
-          reject(err);
+      ],
+      false,
+      (error, resultSet) => {
+        if (error) {
+          reject(error);
           return true;
+        } else if (isResultSetArray(resultSet)) {
+          console.log(resultSet[0].rows[0]);
+          resolve(resultSet[0].rows[0]);
         }
-      );
-    });
+      }
+    );
   });
 }
 
 export function insertCategoryDb({ name, trimName }: NewCategory): Promise<Category> {
   return new Promise((resolve, reject) => {
-    database.transaction((tx) => {
-      tx.executeSql(
-        `INSERT INTO categories (name, trimName) VALUES (?, ?);`,
-        [name, trimName],
-        (_, result) => {
-          console.log(result);
-          const dbResult = result.insertId;
-          if (isCategory(dbResult)) {
-            resolve(dbResult);
-          }
+    database.execRawQuery(
+      [
+        {
+          // Unsupprted on Android using the `exec` function
+          sql: 'INSERT INTO categories (name, trimName) VALUES (?, ?) RETURNING *',
+          args: [name, trimName],
         },
-        (_, err) => {
-          reject(err);
+      ],
+      false,
+      (error, resultSet) => {
+        if (error) {
+          reject(error);
           return true;
+        } else if (isResultSetArray(resultSet) && isCategoryList(resultSet[0].rows)) {
+          console.log(resultSet[0].rows[0]);
+          resolve(resultSet[0].rows[0]);
         }
-      );
-    });
+      }
+    );
   });
 }
 
-export function insertProductCategories(productId: string, categories: Category[]): Promise<void> {
+export function insertProductCategories(
+  productId: string,
+  categories: Category[]
+): Promise<unknown> {
   return new Promise((resolve, reject) => {
-    database.transaction((tx) => {
-      tx.executeSql(
-        `INSERT INTO productCategories (productId, categoryId) VALUES ${categories.map(
-          ({ id }) => `(${productId}, ${id})`
-        )};`,
-        [],
-        (_, result) => {
-          console.log(result);
-          resolve();
+    database.execRawQuery(
+      [
+        {
+          // Unsupprted on Android using the `exec` function
+          sql: `INSERT INTO productCategories (productId, categoryId) VALUES ${categories.map(
+            ({ id }) => `(${productId}, ${id})`
+          )} RETURNING *;`,
+          args: [],
         },
-        (_, err) => {
-          reject(err);
+      ],
+      false,
+      (error, resultSet) => {
+        if (error) {
+          reject(error);
           return true;
+        } else if (isResultSetArray(resultSet)) {
+          console.log(resultSet[0].rows[0]);
+          resolve(resultSet[0].rows[0]);
         }
-      );
-    });
+      }
+    );
   });
 }
 
@@ -213,25 +276,27 @@ export function insertProductCategoriesV2(newCategory: NewCategory[]): Promise<C
 
 export function insertCategoriesDb(newCategory: NewCategory[]): Promise<Category[]> {
   return new Promise((resolve, reject) => {
-    database.transaction((tx) => {
-      tx.executeSql(
-        `INSERT INTO categories (name, trimName) VALUES ${newCategory.map(
-          ({ name, trimName }) => `("${name}", "${trimName}")`
-        )};`,
-        [],
-        (_, result) => {
-          console.log('db insert', result);
-          const dbResult = result.rows._array;
-          if (isCategoryList(dbResult)) {
-            resolve(dbResult);
-          }
+    database.execRawQuery(
+      [
+        {
+          // Unsupprted on Android using the `exec` function
+          sql: `INSERT INTO categories (name, trimName) VALUES ${newCategory.map(
+            ({ name, trimName }) => `("${name}", "${trimName}")`
+          )} RETURNING *;`,
+          args: [],
         },
-        (_, err) => {
-          reject(err);
+      ],
+      false,
+      (error, resultSet) => {
+        if (error) {
+          reject(error);
           return true;
+        } else if (isResultSetArray(resultSet) && isCategoryList(resultSet[0].rows)) {
+          console.log(resultSet[0].rows);
+          resolve(resultSet[0].rows);
         }
-      );
-    });
+      }
+    );
   });
 }
 
@@ -258,37 +323,49 @@ export function fetchCategoriesDb(): Promise<Category[]> {
 
 export function deleteCategoryDb(id: string) {
   return new Promise((resolve, reject) => {
-    database.transaction((tx) => {
-      tx.executeSql(
-        `DELETE FROM categories WHERE id = ?;`,
-        [id],
-        (_, result) => {
-          resolve(result);
+    database.execRawQuery(
+      [
+        {
+          // Unsupprted on Android using the `exec` function
+          sql: 'DELETE FROM categories WHERE id = ? RETURNING *',
+          args: [id],
         },
-        (_, err) => {
-          reject(err);
+      ],
+      false,
+      (error, resultSet) => {
+        if (error) {
+          reject(error);
           return true;
+        } else if (isResultSetArray(resultSet) && isCategory(resultSet[0].rows[0])) {
+          console.log(resultSet[0].rows[0]);
+          resolve(resultSet[0].rows[0]);
         }
-      );
-    });
+      }
+    );
   });
 }
 
 export function updateCategoryDb({ id, name, trimName }: Category) {
   return new Promise((resolve, reject) => {
-    database.transaction((tx) => {
-      tx.executeSql(
-        `UPDATE categories SET name = ?, trimName = ? WHERE id = ?;`,
-        [name, trimName, id],
-        (_, result) => {
-          resolve(result);
+    database.execRawQuery(
+      [
+        {
+          // Unsupprted on Android using the `exec` function
+          sql: 'UPDATE categories SET name = ?, trimName = ? WHERE id = ? RETURNING *',
+          args: [name, trimName, id],
         },
-        (_, err) => {
-          reject(err);
+      ],
+      false,
+      (error, resultSet) => {
+        if (error) {
+          reject(error);
           return true;
+        } else if (isResultSetArray(resultSet) && isCategory(resultSet[0].rows[0])) {
+          console.log(resultSet[0].rows[0]);
+          resolve(resultSet[0].rows[0]);
         }
-      );
-    });
+      }
+    );
   });
 }
 
