@@ -208,7 +208,7 @@ export function deleteProductDb(id: string) {
           reject(error);
           return true;
         } else if (isResultSetArray(resultSet)) {
-          console.log(resultSet[0].rows[0]);
+          console.log('delete product', resultSet[0].rows[0]);
           resolve(resultSet[0].rows[0]);
         }
       }
@@ -232,7 +232,7 @@ export function insertCategoryDb({ name, trimName }: NewCategory): Promise<Categ
           reject(error);
           return true;
         } else if (isResultSetArray(resultSet) && isCategoryList(resultSet[0].rows)) {
-          console.log(resultSet[0].rows[0]);
+          console.log('Insert catepgiry', resultSet[0].rows[0]);
           resolve(resultSet[0].rows[0]);
         }
       }
@@ -261,17 +261,12 @@ export function insertProductCategories(
           reject(error);
           return true;
         } else if (isResultSetArray(resultSet)) {
-          console.log(resultSet[0].rows[0]);
+          console.log('Insert product categories', resultSet[0].rows[0]);
           resolve(resultSet[0].rows[0]);
         }
       }
     );
   });
-}
-
-export function insertProductCategoriesV2(newCategory: NewCategory[]): Promise<Category[]> {
-  const promises = newCategory.map((category) => insertCategoryDb(category));
-  return Promise.all(promises);
 }
 
 export function insertCategoriesDb(newCategory: NewCategory[]): Promise<Category[]> {
@@ -292,7 +287,7 @@ export function insertCategoriesDb(newCategory: NewCategory[]): Promise<Category
           reject(error);
           return true;
         } else if (isResultSetArray(resultSet) && isCategoryList(resultSet[0].rows)) {
-          console.log(resultSet[0].rows);
+          console.log('Inserted Categories', resultSet[0].rows);
           resolve(resultSet[0].rows);
         }
       }
@@ -337,7 +332,7 @@ export function deleteCategoryDb(id: string) {
           reject(error);
           return true;
         } else if (isResultSetArray(resultSet) && isCategory(resultSet[0].rows[0])) {
-          console.log(resultSet[0].rows[0]);
+          console.log('Deleted category', resultSet[0].rows[0]);
           resolve(resultSet[0].rows[0]);
         }
       }
@@ -361,7 +356,7 @@ export function updateCategoryDb({ id, name, trimName }: Category) {
           reject(error);
           return true;
         } else if (isResultSetArray(resultSet) && isCategory(resultSet[0].rows[0])) {
-          console.log(resultSet[0].rows[0]);
+          console.log('Updated Category', resultSet[0].rows[0]);
           resolve(resultSet[0].rows[0]);
         }
       }

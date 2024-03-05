@@ -38,7 +38,7 @@ export function isImage(object: unknown): object is Image {
 export function isCategoryList(array: Array<unknown>): array is Category[] {
   if (Array.isArray(array) && array.length > 0) {
     // @ts-
-    return array.every((object) => 'name' in array);
+    return array.every((object: any) => 'name' in object);
   }
 
   return false;

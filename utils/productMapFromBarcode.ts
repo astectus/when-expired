@@ -29,6 +29,7 @@ export function productMapFromBarcode({ product }: BarCodeProduct): {
   };
 }
 export function productMapFromDb(dbProducts: any[]): Product[] {
+  console.log('dbProducts', dbProducts);
   return dbProducts.map(
     (dp) =>
       new Product({

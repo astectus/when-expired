@@ -10,7 +10,6 @@ import {
   insertCategoriesDb,
   insertCategoryDb,
   insertProductCategories,
-  insertProductCategoriesV2,
   insertProductDb,
   updateCategoryDb,
   updateProductDb,
@@ -94,12 +93,13 @@ function ProductsContextProvider({ children }: { children: ReactElement }) {
       }
     });
 
+    console.log('existingCategories', existingCategories);
+
     if (!categoriesToAdd.length) {
       return [];
     }
     const addedCategories = await insertCategoriesDb(categoriesToAdd);
-    console.log(addedCategories);
-    console.log(existingCategories);
+    console.log('addedCategories', addedCategories);
     setCategories([...categories, ...addedCategories]);
     return [...addedCategories, ...existingCategories];
   }
