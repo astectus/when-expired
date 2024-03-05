@@ -29,9 +29,17 @@ export default function CategorySelector({
       <TextInput
         mode="outlined"
         placeholder="Add Category"
-        onChangeText={(category) =>
-          onAddCategory({ name: category, trimName: category.trim().toLowerCase() })
-        }
+        //@ts-ignore
+        onSubmitEditing={(e: {
+          nativeEvent: { text: string };
+          currentTarget: { clear: () => {} };
+        }) => {
+          onAddCategory({
+            name: e.nativeEvent.text,
+            trimName: e.nativeEvent.text.trim().toLowerCase(),
+          });
+          e.currentTarget.clear();
+        }}
         right={<TextInput.Icon icon="plus" />}
       />
     </View>
