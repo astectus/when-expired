@@ -168,16 +168,18 @@ export function fetchProductsDb(): Promise<Product[]> {
   return new Promise<Product[]>((resolve, reject) => {
     database.transaction((tx) => {
       tx.executeSql(
-        `SELECT 
-                       products.name,
-                       products.expirationDate,
-                       products.price,
-                       products.photoUri,
-                       products.description,
-                       products.id,
-                    GROUP_CONCAT(productCategories.categoryId,',') AS categoryIds
-                    FROM products
-                    LEFT JOIN productCategories ON products.id = productCategories.productId;`,
+        `SELECT
+                       p.name,
+                       p.expirationDate,
+                       p.price,
+                       p.photoUri,
+                       p.description,
+                       p.id,
+                    GROUP_CONCAT(pc.categoryId,',') AS categoryIds
+                    FROM products p
+                    LEFT JOIN productCategories pc ON p.id = pc.productId
+                    WHERE p.name IS NOT NULL;
+                   `,
         [],
         (_, result) => {
           const products = productMapFromDb(result.rows._array);
@@ -261,7 +263,6 @@ export function insertProductCategories(
           reject(error);
           return true;
         } else if (isResultSetArray(resultSet)) {
-          console.log('Insert product categories', resultSet[0].rows[0]);
           resolve(resultSet[0].rows[0]);
         }
       }
