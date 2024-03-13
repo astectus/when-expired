@@ -19,7 +19,7 @@ export default function AddProductScreen({
   navigation: NavigationProp<any>;
   route: any;
 }) {
-  const { addProduct, addCategories } = useContext(ProductsContext);
+  const { addProduct } = useContext(ProductsContext);
   const [product, setProduct] = useState<NewProduct | {}>({
     name: '',
     expirationDate: new Date(),
