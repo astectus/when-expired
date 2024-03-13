@@ -95,7 +95,10 @@ export default function AddProductScreen({
             value={product.description}
             onChangeText={(description) => setProduct({ ...product, description })}
           />
-          <DatePicker defaultDate={product.expirationDate} />
+          <DatePicker
+            defaultDate={product.expirationDate}
+            onChangeDate={(expirationDate) => setProduct({ ...product, expirationDate })}
+          />
           <CategorySelector
             categories={tempCategoriesNames}
             onAddCategory={onAddCategory}
