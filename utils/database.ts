@@ -22,7 +22,7 @@ export const init = () =>
         reject(error);
         return false;
       };
-      tx.executeSql('DROP TABLE IF EXISTS categories;', [], nop, onError);
+      // tx.executeSql('DROP TABLE IF EXISTS categories;', [], nop, onError);
       tx.executeSql(
         `CREATE TABLE IF NOT EXISTS categories (
                          id INTEGER PRIMARY KEY NOT NULL, 
@@ -39,7 +39,7 @@ export const init = () =>
           return true;
         }
       );
-      tx.executeSql('DROP TABLE IF EXISTS products;', [], nop, onError);
+      // tx.executeSql('DROP TABLE IF EXISTS products;', [], nop, onError);
       tx.executeSql(
         `
                      CREATE TABLE IF NOT EXISTS products (
@@ -60,7 +60,7 @@ export const init = () =>
           return true;
         }
       );
-      tx.executeSql('DROP TABLE IF EXISTS productCategories;', [], nop, onError);
+      // tx.executeSql('DROP TABLE IF EXISTS productCategories;', [], nop, onError);
       tx.executeSql(
         `
                      CREATE TABLE IF NOT EXISTS productCategories (

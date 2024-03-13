@@ -19,7 +19,11 @@ export default function AppStacks() {
       <Stack.Screen name="Select method" component={SelectMethodScreen} />
       <Stack.Screen name="Add product" component={AddProductScreen} />
       <Stack.Screen name="Scan barcode" component={ScanBarcodeScreen} />
-      <Stack.Screen name="Product" component={ProductScreen} />
+      <Stack.Screen
+        name="Product"
+        component={ProductScreen}
+        options={{ headerTitle: 'Test', headerShown: true }}
+      />
       <Stack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
