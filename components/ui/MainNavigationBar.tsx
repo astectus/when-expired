@@ -39,6 +39,14 @@ export default function MainNavigationBar({
     setProduct(updatedProduct);
   };
 
+  const Title = () => {
+    if (product) {
+      return <Appbar.Content title={product.name} />
+    } else {
+      return <Appbar.Content title={title} />
+    }
+  }
+
   const title = isString(options?.headerTitle) || route.name;
   const backCallback = customBackRoutes[route.name]
     ? () => navigation.navigate(customBackRoutes[route.name])
@@ -46,7 +54,7 @@ export default function MainNavigationBar({
   return (
     <Appbar.Header>
       <Appbar.BackAction onPress={backCallback} />
-      <Appbar.Content title={title} />
+      <Title/>
       {product && (
         <Appbar.Action
           icon={() => <FavoriteIcon product={product} />}
