@@ -7,11 +7,11 @@ export default function TimeLeft({
   expirationDate,
   onPress,
 }: {
-  expirationDate: Date;
+  expirationDate: string;
   onPress?: () => void;
 }) {
   const daysLeft = useMemo(() => {
-    const days = differenceInDays(new Date(), expirationDate);
+    const days = differenceInDays(new Date(), new Date(expirationDate));
 
     const getLongPeriodText = (days: number) => {
       if (days >= 60) {

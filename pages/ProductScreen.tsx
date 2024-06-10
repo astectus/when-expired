@@ -20,7 +20,6 @@ export default function ProductScreen({
         <Text style={styles.description}>{product.description}</Text>
         <Text style={styles.price}>{product.price}</Text>
         <View style={styles.categoriesContainer}>
-
         </View>
       </View>
     </ScrollView>

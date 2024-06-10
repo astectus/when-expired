@@ -7,7 +7,7 @@ export default class Product {
 
   public name: string;
 
-  public expirationDate: Date;
+  public expirationDate: string;
 
   public price?: string;
 
