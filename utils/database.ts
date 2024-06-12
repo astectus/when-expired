@@ -5,12 +5,9 @@ import {
   isCategory,
   isCategoryList,
   isProduct,
-  isResultSet,
   isResultSetArray,
 } from './typeChecker';
 import { productMapFromDb } from './productMapFromBarcode';
-import { ResultSet } from 'expo-sqlite';
-import { log } from 'expo-updates/build-cli/utils/log';
 
 const database = SQLite.openDatabase('places.db');
 
@@ -117,8 +114,7 @@ export function insertProductDb({
         if (error) {
           reject(error);
           return true;
-        } else if (isResultSetArray(resultSet) && isProduct(resultSet[0].rows[0])) {
-          console.log(resultSet[0].rows[0]);
+        } if (isResultSetArray(resultSet) && isProduct(resultSet[0].rows[0])) {
           resolve(resultSet[0].rows[0]);
         }
       }
@@ -156,7 +152,6 @@ export function updateProductDb({
           reject(error);
           return true;
         } else if (isResultSetArray(resultSet)) {
-          console.log(resultSet[0].rows[0]);
           resolve(resultSet[0].rows[0]);
         }
       }

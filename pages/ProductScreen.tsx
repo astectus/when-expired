@@ -1,16 +1,28 @@
-import { Text, Image, StyleSheet, ScrollView } from 'react-native';
-import { View } from 'react-native';
-import { NavigationProp } from '@react-navigation/native';
-import Product from '../models/Product';
-import { Category } from '../models/Category';
+import { Text, Image, StyleSheet, ScrollView , View } from 'react-native';
 
-export default function ProductScreen({
-                                        route,
-                                      }: {
-  navigation: NavigationProp<any>;
+import { Chip } from 'react-native-paper';
+import { useCallback, useContext } from 'react';
+import Product from '../models/Product';
+import { ProductsContext } from '../state/context/products-context';
+
+export default function ProductScreen(
+  { route }: {
   route: any;
 }) {
   const { product } = route.params as { product: Product };
+  const { categories } = useContext(ProductsContext);
+  console.log(product);
+  console.log(categories);
+
+  const Categories = useCallback(() => {
+    const productCategories = categories.filter(category => product.categoryIds?.includes(category.id.toString()))
+    console.log(productCategories);
+    return productCategories.map(category => <Chip
+      style={styles.category}
+      key={`${category.trimName}`}>
+      {category.name}
+    </Chip>)
+  }, [categories, product]);
 
   return (
     <ScrollView>
@@ -20,6 +32,7 @@ export default function ProductScreen({
         <Text style={styles.description}>{product.description}</Text>
         <Text style={styles.price}>{product.price}</Text>
         <View style={styles.categoriesContainer}>
+          <Categories />
         </View>
       </View>
     </ScrollView>
@@ -33,7 +46,6 @@ const styles = StyleSheet.create({
   image: {
     width: 200,
     height: 200,
-    borderRadius: 100,
     alignSelf: 'center',
   },
   title: {
@@ -60,7 +72,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   category: {
-    fontSize: 14,
-    margin: 4,
+    margin: 5,
   },
 });
