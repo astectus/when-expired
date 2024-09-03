@@ -1,3 +1,3 @@
 export interface Image {
-     uri: string;
+     assets: Array<{ uri: string }>;
 }

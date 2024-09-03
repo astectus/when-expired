@@ -23,7 +23,7 @@ export default function AddImageContainer({
   }, [defaultImageUri]);
 
   const verifyPermissions = async () => {
-    if (cameraPermission?.status === PermissionStatus.UNDETERMINED) {
+    if (!cameraPermission?.granted) {
       const permissionResponse = await askForCameraPermission();
 
       return permissionResponse.granted;
@@ -68,9 +68,11 @@ export default function AddImageContainer({
   };
 
   const setImage = (image: any) => {
+    console.log(image);
     if (isImage(image)) {
-      setImageUri(image.uri);
-      onImagePicked(image.uri);
+      console.log(image);
+      setImageUri(image.assets[0].uri);
+      onImagePicked(image.assets[0].uri);
     }
   };
 

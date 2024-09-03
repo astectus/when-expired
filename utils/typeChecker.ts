@@ -29,7 +29,7 @@ export function isString(object: unknown): object is string {
 export function isImage(object: unknown): object is Image {
   if (object !== null && typeof object === 'object') {
     // @ts-ignore
-    return 'uri' in object;
+    return 'uri' in object.assets[0];
   }
 
   return false;
