@@ -12,6 +12,7 @@ import 'intl';
 import 'intl/locale-data/jsonp/en';
 import { themeColors } from './constants/themeColors';
 import ProductsContextProvider from './state/context/products-context';
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 LogBox.ignoreLogs(['Non-serializable values were found in the navigation state']);
 
@@ -59,7 +60,9 @@ export default function App() {
       <PaperProvider theme={theme}>
         <NavigationContainer onReady={onLayoutRootView}>
           <ProductsContextProvider>
+            <GestureHandlerRootView>
             <AppStacks />
+            </GestureHandlerRootView>
           </ProductsContextProvider>
         </NavigationContainer>
       </PaperProvider>
