@@ -282,7 +282,7 @@ export function insertCategoriesDb(newCategory: NewCategory[]): Promise<Category
         if (error) {
           reject(error);
           return true;
-        } else if (isResultSetArray(resultSet) && isCategoryList(resultSet[0].rows)) {
+        } if (isResultSetArray(resultSet) && isCategoryList(resultSet[0].rows)) {
           console.log('Inserted Categories', resultSet[0].rows);
           resolve(resultSet[0].rows);
         }

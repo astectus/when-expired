@@ -9,7 +9,8 @@ export default function ProductScreen(
   { route }: {
   route: any;
 }) {
-  const { product } = route.params as { product: Product };
+  const { productJSON } = route.params as { productJSON: string };
+  const product: Product = JSON.parse(productJSON);
   const { categories } = useContext(ProductsContext);
   console.log(product);
   console.log(categories);

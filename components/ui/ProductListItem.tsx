@@ -47,6 +47,8 @@ const renderLeftActions = (
     extrapolate: 'clamp',
   });
   return (
+    // @ts-ignore
+    // eslint-disable-next-line react/no-this-in-sfc
     <RectButton style={styles.leftAction} onPress={this.close}>
       <Animated.Text
         style={[
@@ -90,6 +92,7 @@ const renderRightAction = (
 
 const renderRightActions = (
     progress: Animated.AnimatedInterpolation<number>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _dragAnimatedValue: Animated.AnimatedInterpolation<number>
   ) => (
     <View
@@ -110,6 +113,12 @@ const renderRightActions = (
     swipeRef.close();
   };
 
+  const timeLeft = productItem.expirationDate ? (
+    <TimeLeft expirationDate={productItem.expirationDate} />
+  ) : (
+    <Text>No period selected</Text>
+  );
+
   return (
     <Swipeable
       ref={updateRef}
@@ -128,7 +137,7 @@ const renderRightActions = (
       <List.Item
       title={productItem.name}
       onPress={onSelectProduct}
-      description={<TimeLeft expirationDate={productItem.expirationDate} />}
+      description={timeLeft}
       left={avatar}
       right={deleteButton}
       style={styles.listItem}

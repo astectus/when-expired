@@ -36,7 +36,7 @@ export function productMapFromDb(dbProducts: any[]): Product[] {
         new Product({
           id: dp.id?.toString(),
           name: dp.name,
-          expirationDate: dp.expirationDate,
+          expirationDate: new Date(dp.expirationDate),
           price: dp.price,
           photoUri: dp.photoUri,
           description: dp.description,

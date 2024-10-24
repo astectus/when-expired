@@ -31,7 +31,7 @@ export default function HomeScreen({
             renderItem={({ item }) => (
               <ProductListItem
                 productItem={item}
-                onSelectProduct={() => navigate('Product', { product: item })}
+                onSelectProduct={() => navigate('Product', { productJSON: JSON.stringify(item) })}
                 onDeleteItem={() => deleteItem(item.id)}
               />
             )}
