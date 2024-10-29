@@ -1,16 +1,14 @@
-import { Button, TextInput } from 'react-native-paper';
-import { StyleSheet, View, ScrollView, Alert } from 'react-native';
+import { Button } from 'react-native-paper';
+import { StyleSheet, View, Alert } from 'react-native';
 import { useContext, useEffect, useState } from 'react';
 import { NavigationProp } from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { isProduct } from '../utils/typeChecker';
-import DatePicker from '../components/ui/DatePicker';
-import AddImageContainer from '../components/ui/AddImageContainer';
 import { NewProduct } from '../models/Product';
 import { ProductsContext } from '../state/context/products-context';
 import { getProductByBarcode } from '../api/api';
-import CategorySelector from '../components/ui/CategorySelector';
 import { Category, NewCategory } from '../models/Category';
+import ProductView from '../components/ui/ProductView';
 
 export default function AddProductScreen({
   navigation,
@@ -58,59 +56,12 @@ export default function AddProductScreen({
     navigation.navigate('Home');
   };
 
-  const onAddCategory = (category: NewCategory | Category) => {
-    setTempCategoriesNames((prevState) => [...prevState, category]);
-  };
-
-  const onDeleteCategory = (newCategory: NewCategory | Category) => {
-    setTempCategoriesNames((prevState) =>
-      prevState.filter((category) => category.trimName !== newCategory.trimName)
-    );
-  };
-
   // @ts-ignore
   return (
     <View style={styles.container}>
       <Spinner visible={isLoading} textContent="Loading..." textStyle={styles.spinnerTextStyle} />
       {isProduct(product) && (
-        <ScrollView>
-          <TextInput
-            mode="outlined"
-            placeholder="Product name"
-            value={product.name}
-            onChangeText={(name) => setProduct({ ...product, name })}
-          />
-          <TextInput
-            mode="outlined"
-            placeholder="Product price"
-            value={product.price}
-            keyboardType="numeric"
-            onChangeText={(price) => setProduct({ ...product, price })}
-          />
-          <TextInput
-            mode="outlined"
-            placeholder="Product description"
-            multiline
-            numberOfLines={3}
-            value={product.description}
-            onChangeText={(description) => setProduct({ ...product, description })}
-          />
-          <DatePicker
-            defaultDate={product.expirationDate}
-            onChangeDate={(expirationDate) => setProduct({ ...product, expirationDate })}
-          />
-          <CategorySelector
-            categories={tempCategoriesNames}
-            onAddCategory={onAddCategory}
-            onDeleteCategory={onDeleteCategory}
-          />
-          <View style={styles.imageContainer}>
-            <AddImageContainer
-              defaultImageUri={product.photoUri}
-              onImagePicked={(photoUri) => setProduct({ ...product, photoUri })}
-            />
-          </View>
-        </ScrollView>
+        <ProductView product={product} setProduct={setProduct} />
       )}
       <Button
         style={styles.addProductButton}
@@ -130,10 +81,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     padding: 10,
     height: '100%',
-  },
-  imageContainer: {
-    margin: 5,
-    height: 300,
   },
   addProductButton: {
     margin: 5,
