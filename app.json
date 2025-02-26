@@ -27,7 +27,8 @@
         "backgroundColor": "#FFFFFF"
       },
       "permissions": [
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA"
       ],
       "package": "com.anonymous.whenexpired"
     },
@@ -50,12 +51,14 @@
           "recordAudioAndroid": true
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "expo-asset"
     ],
     "extra": {
       "eas": {
         "projectId": "7d360aa2-979a-4f30-88f0-b3579bcd59bb"
       }
-    }
+    },
+    "owner": "astectus"
   }
 }

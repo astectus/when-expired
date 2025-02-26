@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Button } from 'react-native-paper';
-import { CameraView, useCameraPermissions } from 'expo-camera/next';
-import { CameraType } from 'expo-camera';
+import { CameraView, useCameraPermissions, CameraType } from 'expo-camera';
 
 export default function ScanBarcodeScreen({ navigation: { navigate } }: { navigation: any }) {
-  const [type, setType] = useState(CameraType.back);
+  const [type, setType] = useState<CameraType>('back');;
   const [permission, requestPermission] = useCameraPermissions();
 
   if (!permission) {
@@ -25,7 +24,7 @@ export default function ScanBarcodeScreen({ navigation: { navigate } }: { naviga
 
 
   const toggleCameraType = () => {
-    setType(current => (current === CameraType.back ? CameraType.front : CameraType.back));
+    setType(current => (current === 'back' ? 'front' : 'back'));
   }
 
   const handleBarCodeScanned = async ({ data }: { data: string }) => {

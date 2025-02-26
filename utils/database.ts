@@ -9,7 +9,7 @@ import {
 } from './typeChecker';
 import { productMapFromDb } from './productMapFromBarcode';
 
-const database = SQLite.openDatabase('places.db');
+const database = SQLite.openDatabaseSync('places.db');
 
 export const init = () =>
   new Promise((resolve, reject) => {
