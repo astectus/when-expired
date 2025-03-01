@@ -9,83 +9,40 @@ import {
 } from './typeChecker';
 import { productMapFromDb } from './productMapFromBarcode';
 
-const database = SQLite.openDatabaseSync('places.db');
+const database = await SQLite.openDatabaseAsync('places.db');
 
-export const init = () =>
-  new Promise((resolve, reject) => {
-    database.transaction((tx) => {
-      const nop = () => {};
-      const onError = (_: any, error: any) => {
-        reject(error);
-        return false;
-      };
-      // tx.executeSql('DROP TABLE IF EXISTS categories;', [], nop, onError);
-      tx.executeSql(
-        `CREATE TABLE IF NOT EXISTS categories (
-                         id INTEGER PRIMARY KEY NOT NULL, 
-                         name TEXT NOT NULL,
-                         trimName TEXT NOT NULL
-                         );`,
-        [],
-        (_) => {
-          resolve(true);
-        },
-        (_, err) => {
-          console.log(err);
-          reject(err);
-          return true;
-        }
-      );
-      // tx.executeSql('DROP TABLE IF EXISTS products;', [], nop, onError);
-      tx.executeSql(
-        `
-                     CREATE TABLE IF NOT EXISTS products (
-                         id INTEGER PRIMARY KEY NOT NULL, 
-                         name TEXT NOT NULL, 
-                         expirationDate TEXT NOT NULL, 
-                         price TEXT, 
-                         photoUri TEXT, 
-                         description TEXT
-                         );`,
-        [],
-        (_) => {
-          resolve(true);
-        },
-        (_, err) => {
-          reject(err);
-          console.log(err);
-          return true;
-        }
-      );
-      // tx.executeSql('DROP TABLE IF EXISTS productCategories;', [], nop, onError);
-      tx.executeSql(
-        `
-                     CREATE TABLE IF NOT EXISTS productCategories (
-                       id INTEGER PRIMARY KEY NOT NULL, 
-                       productId INTEGER NOT NULL, 
-                       categoryId INTEGER NOT NULL,
-                          CONSTRAINT fk_product
-                               FOREIGN KEY (productId)
-                               REFERENCES products(id)
-                               ON DELETE CASCADE,
-                           CONSTRAINT fk_category
-                               FOREIGN KEY (categoryId)
-                               REFERENCES category(id)
-                               ON DELETE CASCADE
-                               );                                 
-                         `,
-        [],
-        (_) => {
-          resolve(true);
-        },
-        (_, err) => {
-          reject(err);
-          console.log(err);
-          return true;
-        }
-      );
-    });
-  });
+export const init = () => {
+  await database.execAsync(`
+PRAGMA journal_mode = WAL;
+PRAGMA foreign_keys = ON;
+CREATE TABLE IF NOT EXISTS categories (
+            id INTEGER PRIMARY KEY NOT NULL, 
+            name TEXT NOT NULL,
+            trimName TEXT NOT NULL
+          );
+CREATE TABLE IF NOT EXISTS products (
+            id INTEGER PRIMARY KEY NOT NULL, 
+            name TEXT NOT NULL, 
+            expirationDate TEXT NOT NULL, 
+            price TEXT, 
+            photoUri TEXT, 
+            description TEXT
+          );
+CREATE TABLE IF NOT EXISTS productCategories (
+            id INTEGER PRIMARY KEY NOT NULL, 
+            productId INTEGER NOT NULL, 
+            categoryId INTEGER NOT NULL,
+            CONSTRAINT fk_product
+              FOREIGN KEY (productId)
+              REFERENCES products(id)
+              ON DELETE CASCADE,
+            CONSTRAINT fk_category
+              FOREIGN KEY (categoryId)
+              REFERENCES categories(id)
+              ON DELETE CASCADE
+          );            
+`);
+}
 
 export function insertProductDb({
   name,
@@ -95,7 +52,7 @@ export function insertProductDb({
   description,
 }: Product): Promise<Product> {
   return new Promise((resolve, reject) => {
-    database.execRawQuery(
+    database.(
       [
         {
           // Unsupprted on Android using the `exec` function
