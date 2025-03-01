@@ -39,12 +39,12 @@ export default function MainNavigationBar({
     setProduct(updatedProduct);
   };
 
-  const Title = () => {
+  function Title() {
     if (product) {
       return <Appbar.Content title={product.name} />
-    } else {
+    } 
       return <Appbar.Content title={title} />
-    }
+    
   }
 
   const title = isString(options?.headerTitle) || route.name;

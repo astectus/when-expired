@@ -16,10 +16,10 @@ export default function CategorySelector({
       <View>
         {categories &&
           categories.length > 0 &&
-          categories.map((category, index) => (
+          categories.map((category) => (
             <Chip
               icon="information"
-              key={`${category.trimName}${index}`}
+              key={category.id}
               onClose={() => onDeleteCategory(category)}
             >
               {category.name}
@@ -29,7 +29,7 @@ export default function CategorySelector({
       <TextInput
         mode="outlined"
         placeholder="Add Category"
-        //@ts-ignore
+        // @ts-ignore
         onSubmitEditing={(e: {
           nativeEvent: { text: string };
           currentTarget: { clear: () => {} };

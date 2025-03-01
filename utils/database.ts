@@ -1,339 +1,330 @@
 import * as SQLite from 'expo-sqlite';
 import Product from '../models/Product';
 import { Category, NewCategory } from '../models/Category';
-import {
-  isCategory,
-  isCategoryList,
-  isProduct,
-  isResultSetArray,
-} from './typeChecker';
 import { productMapFromDb } from './productMapFromBarcode';
 
-const database = await SQLite.openDatabaseAsync('places.db');
+// Initialize database
+let database: SQLite.SQLiteDatabase;
 
-export const init = () => {
-  await database.execAsync(`
-PRAGMA journal_mode = WAL;
-PRAGMA foreign_keys = ON;
-CREATE TABLE IF NOT EXISTS categories (
-            id INTEGER PRIMARY KEY NOT NULL, 
-            name TEXT NOT NULL,
-            trimName TEXT NOT NULL
-          );
-CREATE TABLE IF NOT EXISTS products (
-            id INTEGER PRIMARY KEY NOT NULL, 
-            name TEXT NOT NULL, 
-            expirationDate TEXT NOT NULL, 
-            price TEXT, 
-            photoUri TEXT, 
-            description TEXT
-          );
-CREATE TABLE IF NOT EXISTS productCategories (
-            id INTEGER PRIMARY KEY NOT NULL, 
-            productId INTEGER NOT NULL, 
-            categoryId INTEGER NOT NULL,
-            CONSTRAINT fk_product
-              FOREIGN KEY (productId)
-              REFERENCES products(id)
-              ON DELETE CASCADE,
-            CONSTRAINT fk_category
-              FOREIGN KEY (categoryId)
-              REFERENCES categories(id)
-              ON DELETE CASCADE
-          );            
-`);
-}
+// Initialize the database connection
+export const initDatabase = async () => {
+  database = await SQLite.openDatabaseAsync('places.db');
+  await init();
+};
 
-export function insertProductDb({
-  name,
-  expirationDate,
-  price,
-  photoUri,
-  description,
-}: Product): Promise<Product> {
-  return new Promise((resolve, reject) => {
-    database.(
-      [
-        {
-          // Unsupprted on Android using the `exec` function
-          sql: 'INSERT INTO products (name, expirationDate, price, photoUri, description) VALUES (?, ?, ?, ?, ?) RETURNING *',
-          args: [
-            name,
-            expirationDate.toISOString(),
-            price || '',
-            photoUri || '',
-            description || '',
-          ],
-        },
-      ],
-      false,
-      (error, resultSet) => {
-        if (error) {
-          reject(error);
-          return true;
-        } if (isResultSetArray(resultSet) && isProduct(resultSet[0].rows[0])) {
-          resolve(resultSet[0].rows[0]);
-        }
-      }
-    );
-  });
-}
+export const init = async () => {
+  database = await SQLite.openDatabaseAsync('places.db');
+  try {
+    await database.execAsync(`
+      PRAGMA journal_mode = WAL;
+      PRAGMA foreign_keys = ON;
+    `);
 
-export function updateProductDb({
-  id,
-  name,
-  expirationDate,
-  price,
-  photoUri,
-  description,
-}: Product) {
-  return new Promise((resolve, reject) => {
-    database.execRawQuery(
-      [
-        {
-          // Unsupprted on Android using the `exec` function
-          sql: 'UPDATE products SET name = ?, expirationDate = ?, price = ?, photoUri = ?, description = ? WHERE id = ? RETURNING *',
-          args: [
-            name,
-            expirationDate.toISOString(),
-            price || '',
-            photoUri || '',
-            description || '',
-            id,
-          ],
-        },
-      ],
-      false,
-      (error, resultSet) => {
-        if (error) {
-          reject(error);
-          return true;
-        } else if (isResultSetArray(resultSet)) {
-          resolve(resultSet[0].rows[0]);
-        }
-      }
-    );
-  });
-}
-
-export function fetchProductsDb(): Promise<Product[]> {
-  return new Promise<Product[]>((resolve, reject) => {
-    database.transaction((tx) => {
-      tx.executeSql(
-        `SELECT
-                       p.name,
-                       p.expirationDate,
-                       p.price,
-                       p.photoUri,
-                       p.description,
-                       p.id,
-                    GROUP_CONCAT(pc.categoryId,',') AS categoryIds
-                    FROM products p
-                    LEFT JOIN productCategories pc ON p.id = pc.productId
-                    WHERE p.name IS NOT NULL;
-                   `,
-        [],
-        (_, result) => {
-          const products = productMapFromDb(result.rows._array);
-          resolve(products);
-        },
-        (_, err) => {
-          reject(err);
-          return true;
-        }
+    await database.execAsync(`
+      CREATE TABLE IF NOT EXISTS categories (
+        id INTEGER PRIMARY KEY NOT NULL,
+        name TEXT NOT NULL,
+        trimName TEXT NOT NULL
       );
-    });
-  });
+    `);
+
+    await database.execAsync(`
+      CREATE TABLE IF NOT EXISTS products (
+        id INTEGER PRIMARY KEY NOT NULL,
+        name TEXT NOT NULL,
+        expirationDate TEXT NOT NULL,
+        price TEXT,
+        photoUri TEXT,
+        description TEXT
+      );
+    `);
+
+    await database.execAsync(`
+      CREATE TABLE IF NOT EXISTS productCategories (
+        id INTEGER PRIMARY KEY NOT NULL,
+        productId INTEGER NOT NULL,
+        categoryId INTEGER NOT NULL,
+        FOREIGN KEY (productId) REFERENCES products(id) ON DELETE CASCADE,
+        FOREIGN KEY (categoryId) REFERENCES categories(id) ON DELETE CASCADE
+      );
+    `);
+    return true;
+  } catch (error) {
+    console.error('Database initialization error:', error);
+    return false;
+  }
+};
+
+export async function insertProductDb({
+                                        name,
+                                        expirationDate,
+                                        price,
+                                        photoUri,
+                                        description,
+                                      }: Product): Promise<Product> {
+  try {
+    // Insert the product
+    const query = `
+      INSERT INTO products (name, expirationDate, price, photoUri, description)
+      VALUES ('${name}', '${expirationDate.toISOString()}', '${price || ''}', '${photoUri || ''}', '${description || ''}')
+    `;
+    await database.execAsync(query);
+
+    // Get the last inserted row
+    const result = await database.getAllAsync(`
+      SELECT * FROM products WHERE id = last_insert_rowid()
+    `);
+
+    if (result && result.length > 0) {
+      return result[0] as Product;
+    }
+    throw new Error('Failed to insert product');
+  } catch (error) {
+    console.error('Error inserting product:', error);
+    throw error;
+  }
 }
 
-export function deleteProductDb(id: string) {
-  return new Promise((resolve, reject) => {
-    database.execRawQuery(
-      [
-        {
-          // Unsupprted on Android using the `exec` function
-          sql: 'DELETE FROM products WHERE id = ? RETURNING *',
-          args: [id],
-        },
-      ],
-      false,
-      (error, resultSet) => {
-        if (error) {
-          reject(error);
-          return true;
-        } else if (isResultSetArray(resultSet)) {
-          console.log('delete product', resultSet[0].rows[0]);
-          resolve(resultSet[0].rows[0]);
-        }
-      }
+export async function updateProductDb({
+                                        id,
+                                        name,
+                                        expirationDate,
+                                        price,
+                                        photoUri,
+                                        description,
+                                      }: Product): Promise<Product> {
+  try {
+    const query = `
+      UPDATE products
+      SET name = '${name}',
+          expirationDate = '${expirationDate.toISOString()}',
+          price = '${price || ''}',
+          photoUri = '${photoUri || ''}',
+          description = '${description || ''}'
+      WHERE id = ${id}
+    `;
+    await database.execAsync(query);
+
+    // Get the updated row
+    const result = await database.getAllAsync(`
+      SELECT * FROM products WHERE id = ${id}
+    `);
+
+    if (result && result.length > 0) {
+      return result[0] as Product;
+    }
+    throw new Error('Failed to update product');
+  } catch (error) {
+    console.error('Error updating product:', error);
+    throw error;
+  }
+}
+
+export async function fetchProductsDb(): Promise<Product[]> {
+  try {
+    const result = await database.getAllAsync(`
+      SELECT
+        p.name,
+        p.expirationDate,
+        p.price,
+        p.photoUri,
+        p.description,
+        p.id,
+        GROUP_CONCAT(pc.categoryId,',') AS categoryIds
+      FROM products p
+      LEFT JOIN productCategories pc ON p.id = pc.productId
+      GROUP BY p.id
+      HAVING p.name IS NOT NULL
+    `);
+
+    if (result) {
+      return productMapFromDb(result as any[]);
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    throw error;
+  }
+}
+
+export async function deleteProductDb(id: string): Promise<any> {
+  try {
+    // Get the product before deleting
+    const product = await database.getAllAsync(
+      `SELECT * FROM products WHERE id = ${id}`
     );
-  });
+
+    // Delete the product
+    await database.execAsync(`DELETE FROM products WHERE id = ${id}`);
+
+    if (product && product.length > 0) {
+      return product[0];
+    }
+    return null;
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    throw error;
+  }
 }
 
-export function insertCategoryDb({ name, trimName }: NewCategory): Promise<Category> {
-  return new Promise((resolve, reject) => {
-    database.execRawQuery(
-      [
-        {
-          // Unsupprted on Android using the `exec` function
-          sql: 'INSERT INTO categories (name, trimName) VALUES (?, ?) RETURNING *',
-          args: [name, trimName],
-        },
-      ],
-      false,
-      (error, resultSet) => {
-        if (error) {
-          reject(error);
-          return true;
-        } else if (isResultSetArray(resultSet) && isCategoryList(resultSet[0].rows)) {
-          console.log('Insert catepgiry', resultSet[0].rows[0]);
-          resolve(resultSet[0].rows[0]);
-        }
-      }
+export async function insertCategoryDb({ name, trimName }: NewCategory): Promise<Category> {
+  try {
+    await database.execAsync(
+      `INSERT INTO categories (name, trimName) VALUES ('${name}', '${trimName}')`
     );
-  });
+
+    const result = await database.getAllAsync(
+      `SELECT * FROM categories WHERE id = last_insert_rowid()`
+    );
+
+    if (result && result.length > 0) {
+      return result[0] as Category;
+    }
+    throw new Error('Failed to insert category');
+  } catch (error) {
+    console.error('Error inserting category:', error);
+    throw error;
+  }
 }
 
-export function insertProductCategories(
+export async function insertProductCategories(
   productId: string,
   categories: Category[]
 ): Promise<unknown> {
-  return new Promise((resolve, reject) => {
-    database.execRawQuery(
-      [
-        {
-          // Unsupprted on Android using the `exec` function
-          sql: `INSERT INTO productCategories (productId, categoryId) VALUES ${categories.map(
-            ({ id }) => `(${productId}, ${id})`
-          )} RETURNING *;`,
-          args: [],
-        },
-      ],
-      false,
-      (error, resultSet) => {
-        if (error) {
-          reject(error);
-          return true;
-        } else if (isResultSetArray(resultSet)) {
-          resolve(resultSet[0].rows[0]);
-        }
-      }
+  try {
+    if (categories.length === 0) return null;
+
+    const values = categories.map(category =>
+      `('${productId}', '${category.id}')`
+    ).join(', ');
+
+    await database.execAsync(
+      `INSERT INTO productCategories (productId, categoryId) VALUES ${values}`
     );
-  });
-}
 
-export function insertCategoriesDb(newCategory: NewCategory[]): Promise<Category[]> {
-  return new Promise((resolve, reject) => {
-    database.execRawQuery(
-      [
-        {
-          // Unsupprted on Android using the `exec` function
-          sql: `INSERT INTO categories (name, trimName) VALUES ${newCategory.map(
-            ({ name, trimName }) => `("${name}", "${trimName}")`
-          )} RETURNING *;`,
-          args: [],
-        },
-      ],
-      false,
-      (error, resultSet) => {
-        if (error) {
-          reject(error);
-          return true;
-        } if (isResultSetArray(resultSet) && isCategoryList(resultSet[0].rows)) {
-          console.log('Inserted Categories', resultSet[0].rows);
-          resolve(resultSet[0].rows);
-        }
-      }
+    const result = await database.getAllAsync(
+      `SELECT * FROM productCategories WHERE productId = '${productId}'`
     );
-  });
+
+    if (result && result.length > 0) {
+      return result;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error inserting product categories:', error);
+    throw error;
+  }
 }
 
-export function fetchCategoriesDb(): Promise<Category[]> {
-  return new Promise<Category[]>((resolve, reject) => {
-    database.transaction((tx) => {
-      tx.executeSql(
-        `SELECT * FROM categories;`,
-        [],
-        (_, result) => {
-          if (isCategoryList(result.rows._array)) {
-            resolve(result.rows._array);
-          }
-          resolve([]);
-        },
-        (_, err) => {
-          reject(err);
-          return true;
-        }
-      );
-    });
-  });
-}
+export async function insertCategoriesDb(newCategories: NewCategory[]): Promise<Category[]> {
+  try {
+    if (newCategories.length === 0) return [];
 
-export function deleteCategoryDb(id: string) {
-  return new Promise((resolve, reject) => {
-    database.execRawQuery(
-      [
-        {
-          // Unsupprted on Android using the `exec` function
-          sql: 'DELETE FROM categories WHERE id = ? RETURNING *',
-          args: [id],
-        },
-      ],
-      false,
-      (error, resultSet) => {
-        if (error) {
-          reject(error);
-          return true;
-        } else if (isResultSetArray(resultSet) && isCategory(resultSet[0].rows[0])) {
-          console.log('Deleted category', resultSet[0].rows[0]);
-          resolve(resultSet[0].rows[0]);
-        }
-      }
+    const values = newCategories.map(category =>
+      `('${category.name}', '${category.trimName}')`
+    ).join(', ');
+
+    await database.execAsync(
+      `INSERT INTO categories (name, trimName) VALUES ${values}`
     );
-  });
-}
 
-export function updateCategoryDb({ id, name, trimName }: Category) {
-  return new Promise((resolve, reject) => {
-    database.execRawQuery(
-      [
-        {
-          // Unsupprted on Android using the `exec` function
-          sql: 'UPDATE categories SET name = ?, trimName = ? WHERE id = ? RETURNING *',
-          args: [name, trimName, id],
-        },
-      ],
-      false,
-      (error, resultSet) => {
-        if (error) {
-          reject(error);
-          return true;
-        } else if (isResultSetArray(resultSet) && isCategory(resultSet[0].rows[0])) {
-          console.log('Updated Category', resultSet[0].rows[0]);
-          resolve(resultSet[0].rows[0]);
-        }
-      }
+    // Get all the categories that match our newly inserted names
+    const names = newCategories.map(cat => `'${cat.name}'`).join(',');
+    const result = await database.getAllAsync(
+      `SELECT * FROM categories WHERE name IN (${names})`
     );
-  });
+
+    if (result && result.length > 0) {
+      return result as Category[];
+    }
+    return [];
+  } catch (error) {
+    console.error('Error inserting categories:', error);
+    throw error;
+  }
 }
 
-export function fetchProductsByCategories(categories: Category[]): Promise<Product[]> {
-  return new Promise((resolve, reject) => {
-    database.transaction((tx) => {
-      tx.executeSql(
-        `SELECT * FROM products p
-                       INNER JOIN productCategories pc ON p.id = pc.productId
-                          WHERE pc.categoryId IN (${categories.map((c) => c.id).join(',')});`,
-        [],
-        (_, result) => {
-          const products = productMapFromDb(result.rows._array);
-          resolve(products);
-        },
-        (_, err) => {
-          reject(err);
-          return true;
-        }
-      );
-    });
-  });
+export async function fetchCategoriesDb(): Promise<Category[]> {
+  try {
+    const result = await database.getAllAsync('SELECT * FROM categories');
+
+    if (result) {
+      return result as Category[];
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    throw error;
+  }
+}
+
+export async function deleteCategoryDb(id: string): Promise<Category | null> {
+  try {
+    // Get the category before deleting
+    const category = await database.getAllAsync(
+      `SELECT * FROM categories WHERE id = ${id}`
+    );
+
+    // Delete the category
+    await database.execAsync(`DELETE FROM categories WHERE id = ${id}`);
+
+    if (category && category.length > 0) {
+      return category[0] as Category;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error deleting category:', error);
+    throw error;
+  }
+}
+
+export async function updateCategoryDb({ id, name, trimName }: Category): Promise<Category> {
+  try {
+    await database.execAsync(
+      `UPDATE categories SET name = '${name}', trimName = '${trimName}' WHERE id = ${id}`
+    );
+
+    const result = await database.getAllAsync(
+      `SELECT * FROM categories WHERE id = ${id}`
+    );
+
+    if (result && result.length > 0) {
+      return result[0] as Category;
+    }
+    throw new Error('Failed to update category');
+  } catch (error) {
+    console.error('Error updating category:', error);
+    throw error;
+  }
+}
+
+export async function fetchProductsByCategories(categories: Category[]): Promise<Product[]> {
+  try {
+    if (categories.length === 0) return [];
+
+    const categoryIds = categories.map(c => `'${c.id}'`).join(',');
+
+    const result = await database.getAllAsync(`
+      SELECT
+        p.name,
+        p.expirationDate,
+        p.price,
+        p.photoUri,
+        p.description,
+        p.id,
+        GROUP_CONCAT(pc.categoryId,',') AS categoryIds
+      FROM products p
+      JOIN productCategories pc ON p.id = pc.productId
+      WHERE pc.categoryId IN (${categoryIds})
+      GROUP BY p.id
+    `);
+
+    if (result) {
+      return productMapFromDb(result as any[]);
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching products by categories:', error);
+    throw error;
+  }
 }

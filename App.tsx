@@ -6,13 +6,13 @@ import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
 import { enGB, registerTranslation } from 'react-native-paper-dates';
 import { LogBox } from 'react-native';
-import { init } from './utils/database';
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { initDatabase } from './utils/database';
 import AppStacks from './components/navigation/AppStacks';
 import 'intl';
 import 'intl/locale-data/jsonp/en';
 import { themeColors } from './constants/themeColors';
 import ProductsContextProvider from './state/context/products-context';
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 LogBox.ignoreLogs(['Non-serializable values were found in the navigation state']);
 
@@ -33,7 +33,7 @@ export default function App() {
   useEffect(() => {
     async function prepare() {
       try {
-        await init();
+        await initDatabase();
       } catch (e) {
         console.warn(e);
       } finally {

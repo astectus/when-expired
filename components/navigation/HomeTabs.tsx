@@ -1,10 +1,10 @@
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import FavoriteScreen from '../../pages/FavoriteScreen';
 import HomeScreen from '../../pages/HomeScreen';
 
-const Tab = createMaterialBottomTabNavigator();
+const Tab = createBottomTabNavigator();
 export default function HomeTabs() {
   return (
     <Tab.Navigator activeColor="#e91e63" barStyle={{ backgroundColor: 'tomato' }}>

@@ -13,7 +13,7 @@ export default function AppStacks() {
     <Stack.Navigator
       initialRouteName="HomeTabs"
       screenOptions={{
-        header: (props) => <MainNavigationBar {...props} />,
+        header: ({ navigation, route, options }) => <MainNavigationBar navigation={navigation} route={route} options={options}/>,
       }}
     >
       <Stack.Screen name="Select method" component={SelectMethodScreen} />

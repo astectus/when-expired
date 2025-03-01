@@ -15,7 +15,7 @@
         "project": ["./tsconfig.json"]
     },
     "plugins": ["react", "react-native", "@typescript-eslint", "prettier"],
-
+    "ignorePatterns": ["dist/", "build/", "coverage/", "node_modules/", "android/", "ios/", "metro.config.js", "jest.config.js"],
     "rules": {
         "react-native/no-unused-styles": 2,
         "react-native/split-platform-components": 2,
