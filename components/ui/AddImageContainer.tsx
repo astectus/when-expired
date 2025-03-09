@@ -4,7 +4,7 @@ import { launchCameraAsync, PermissionStatus, useCameraPermissions } from 'expo-
 import { useEffect, useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import { isImage } from '../../utils/typeChecker';
-import { themeColors } from '../../constants/themeColors';
+import { lightColors } from '../../constants/themeColors';
 
 export default function AddImageContainer({
   onImagePicked,
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   container: {
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: themeColors.tertiaryContainer,
+    backgroundColor: lightColors.tertiaryContainer,
     padding: 5,
     borderRadius: 20,
     height: '100%',

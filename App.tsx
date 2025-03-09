@@ -11,7 +11,7 @@ import { initDatabase } from './utils/database';
 import AppStacks from './components/navigation/AppStacks';
 import 'intl';
 import 'intl/locale-data/jsonp/en';
-import { themeColors } from './constants/themeColors';
+import { lightColors } from './constants/themeColors';
 import ProductsContextProvider from './state/context/products-context';
 
 LogBox.ignoreLogs(['Non-serializable values were found in the navigation state']);
@@ -21,7 +21,7 @@ preventAutoHideAsync();
 
 const theme = {
   ...DefaultTheme,
-  colors: themeColors,
+  colors: lightColors,
 };
 
 export default function App() {
