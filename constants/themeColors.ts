@@ -1,5 +1,5 @@
 export const lightColors = {
-  "primary": "rgb(156, 65, 63)",
+  "primary": "#9c413f",
     "onPrimary": "rgb(255, 255, 255)",
     "primaryContainer": "rgb(255, 218, 215)",
     "onPrimaryContainer": "rgb(65, 0, 5)",

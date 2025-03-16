@@ -1,6 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useTheme } from 'react-native-paper';
 
 import FavoriteScreen from '../../pages/FavoriteScreen';
 import HomeScreen from '../../pages/HomeScreen';
@@ -8,11 +9,21 @@ import HomeScreen from '../../pages/HomeScreen';
 const Tab = createBottomTabNavigator();
 
 export default function HomeTabs() {
+  const theme = useTheme();
+  
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: '#e91e63',
-        tabBarStyle: { backgroundColor: 'tomato' }
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
+        tabBarStyle: { 
+          backgroundColor: theme.colors.surface,
+          borderTopColor: theme.colors.outline
+        },
+        headerStyle: {
+          backgroundColor: theme.colors.surface,
+        },
+        headerTintColor: theme.colors.onSurface,
       }}
     >
       <Tab.Screen
