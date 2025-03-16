@@ -16,9 +16,17 @@ export default function HomeTabs() {
       screenOptions={{
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
+        tabBarShowLabel: false,
         tabBarStyle: { 
           backgroundColor: theme.colors.surface,
-          borderTopColor: theme.colors.outline
+          borderTopColor: theme.colors.outline,
+          height: 60,
+          paddingBottom: 10,
+          paddingTop: 10,
+        },
+        tabBarItemStyle: {
+          justifyContent: 'center',
+          alignItems: 'center'
         },
         headerStyle: {
           backgroundColor: theme.colors.surface,
