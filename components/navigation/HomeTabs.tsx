@@ -5,6 +5,7 @@ import { useTheme } from 'react-native-paper';
 
 import FavoriteScreen from '../../pages/FavoriteScreen';
 import HomeScreen from '../../pages/HomeScreen';
+import SettingsScreen from '../../pages/SettingsScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -51,6 +52,16 @@ export default function HomeTabs() {
           tabBarLabel: 'Favorite',
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="bell" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{
+          tabBarLabel: 'Settings',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="cog" color={color} size={size} />
           ),
         }}
       />

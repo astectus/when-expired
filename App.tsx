@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { preventAutoHideAsync, hideAsync } from 'expo-splash-screen';
 import { QueryClientProvider, QueryClient } from 'react-query';
 import { Provider as PaperProvider, MD3LightTheme, MD3DarkTheme } from 'react-native-paper';
@@ -12,6 +12,8 @@ import 'intl';
 import 'intl/locale-data/jsonp/en';
 import { lightColors, darkColors } from './constants/themeColors';
 import ProductsContextProvider from './state/context/products-context';
+import { PreferencesProvider, usePreferences } from './context/PreferencesContext';
+import HomeTabs from './components/navigation/HomeTabs';
 
 LogBox.ignoreLogs(['Non-serializable values were found in the navigation state']);
 
@@ -56,11 +58,10 @@ const CustomNavigationDarkTheme = {
   },
 };
 
-export default function App() {
-  const queryClient = new QueryClient();
-  const colorScheme = useColorScheme();
-  const theme = colorScheme === 'dark' ? CustomDarkTheme : CustomLightTheme;
-  const navigationTheme = colorScheme === 'dark' ? CustomNavigationDarkTheme : CustomNavigationLightTheme;
+const Main = () => {
+  const { isThemeDark } = usePreferences();
+  const theme = isThemeDark ? CustomDarkTheme : CustomLightTheme;
+  const navigationTheme = isThemeDark ? CustomNavigationDarkTheme : CustomNavigationLightTheme;
 
   const [dbInitialized, setDbInitialized] = useState(false);
 
@@ -96,17 +97,22 @@ export default function App() {
   }
 
   return (
-    // @ts-ignore
-    <QueryClientProvider client={queryClient}>
-      <PaperProvider theme={theme}>
-        <NavigationContainer theme={navigationTheme} onReady={onLayoutRootView}>
-          <ProductsContextProvider>
-            <GestureHandlerRootView style={{ flex: 1 }}>
+    <PaperProvider theme={theme}>
+      <NavigationContainer theme={navigationTheme} onReady={onLayoutRootView}>
+        <ProductsContextProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
             <AppStacks />
-            </GestureHandlerRootView>
-          </ProductsContextProvider>
-        </NavigationContainer>
-      </PaperProvider>
-    </QueryClientProvider>
+          </GestureHandlerRootView>
+        </ProductsContextProvider>
+      </NavigationContainer>
+    </PaperProvider>
+  );
+};
+
+export default function App() {
+  return (
+    <PreferencesProvider>
+      <Main />
+    </PreferencesProvider>
   );
 }

@@ -12,6 +12,7 @@ import { ProductsContext } from '../../state/context/products-context';
 
 const customBackRoutes: Record<string, string> = {
   'Add product': 'Select method',
+  'Select method': 'HomeTabs',
 };
 
 export default function MainNavigationBar({
