@@ -61,29 +61,42 @@ export default function AddProductScreen({
     <View style={styles.container}>
       <Spinner visible={isLoading} textContent="Loading..." textStyle={styles.spinnerTextStyle} />
       {isProduct(product) && (
-        <ProductView product={product} setProduct={setProduct} />
+        <View style={styles.productViewContainer}>
+          <ProductView product={product} setProduct={setProduct} />
+        </View>
       )}
-      <Button
-        style={styles.addProductButton}
-        icon="calendar"
-        onPress={onSaveProduct}
-        mode="contained"
-      >
-        Add product
-      </Button>
+      <View style={styles.buttonContainer}>
+        <Button
+          style={styles.addProductButton}
+          icon="calendar"
+          onPress={onSaveProduct}
+          mode="contained"
+        >
+          Add product
+        </Button>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    display: 'flex',
+    flex: 1,
     flexDirection: 'column',
+    justifyContent: 'space-between',
     padding: 10,
     height: '100%',
   },
+  productViewContainer: {
+    flex: 1,
+  },
+  buttonContainer: {
+    marginTop: 10,
+    marginBottom: 20,
+  },
   addProductButton: {
     margin: 5,
+    paddingVertical: 5,
   },
   spinnerTextStyle: {
     color: '#FFF',
