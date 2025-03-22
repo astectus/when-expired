@@ -1,15 +1,49 @@
 {
-     // Use IntelliSense to learn about possible attributes.
-     // Hover to view descriptions of existing attributes.
-     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
      "version": "0.2.0",
      "configurations": [
-          {
-               "type": "chrome",
-               "request": "launch",
-               "name": "Launch Chrome against localhost",
-               "url": "http://localhost:8080",
-               "webRoot": "${workspaceFolder}"
-          }
+
+       {
+         "type": "chrome",
+         "request": "launch",
+         "name": "Launch Chrome against localhost",
+         "url": "http://localhost:8080",
+         "webRoot": "${workspaceFolder}"
+       },
+       {
+         "name": "Debug Android",
+         "type": "reactnative",
+         "request": "launch",
+         "platform": "android",
+         "sourceMaps": true
+       },
+       {
+         "name": "Debug iOS",
+         "type": "reactnative",
+         "request": "launch",
+         "platform": "ios",
+         "sourceMaps": true
+       },
+       {
+         "name": "Attach to packager",
+         "type": "reactnative",
+         "request": "attach",
+         "port": 19000,
+         "sourceMaps": true,
+         "cwd": "${workspaceFolder}"
+       },
+      //  {
+      //    "name": "Debug Expo",
+      //    "type": "reactnative",
+      //    "request": "attach",
+      //    "sourceMaps": true,
+      //    "cwd": "${workspaceFolder}"
+      //  },
+       {
+          "type": "expo",
+          "request": "attach",
+          "name": "Inspect Expo app",
+          "projectRoot": "${workspaceFolder}",
+          "bundlerHost": "127.0.0.1"
+      }
      ]
-}
+   }

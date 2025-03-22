@@ -64,6 +64,12 @@ export default function App() {
 
   const [dbInitialized, setDbInitialized] = useState(false);
 
+  if (__DEV__) {
+    console.log('Running in development mode');
+  } else {
+    console.log('Running in production mode');
+  }
+
   // initialize database
   useEffect(() => {
     async function prepare() {
